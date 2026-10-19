@@ -1,0 +1,1490 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>EverydayPaks — Amazon Launch Strategy</title>
+<link rel="icon" href="favicon.ico">
+<link href="https://fonts.googleapis.com/css2?family=Gabarito:wght@500;600;700;800;900&family=Figtree:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --graphite:#181B1F; --bone:#F2F4F6; --orange:#F67A1C; --orange-dark:#D4650F;
+    --blue:#1273C8; --char:#21252B; --border:#2B2F36; --muted:#8A9099;
+    --font-display:'Gabarito',system-ui,sans-serif;
+    --font-body:'Figtree',-apple-system,'Helvetica Neue',sans-serif;
+    --font-mono:'IBM Plex Mono',ui-monospace,'SF Mono',monospace;
+  }
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+  html{scroll-behavior:smooth;}
+  body{font-family:var(--font-body);background:var(--graphite);color:var(--bone);overflow-x:hidden;}
+
+  /* NAV */
+  nav{position:fixed;top:0;left:0;right:0;z-index:100;background:var(--char);border-bottom:1px solid var(--border);height:60px;padding:0 2rem;display:flex;align-items:center;justify-content:space-between;}
+  .nav-brand{font-family:var(--font-display);font-size:1.25rem;font-weight:800;color:var(--bone);letter-spacing:.01em;white-space:nowrap;}
+  .nav-brand span{color:var(--orange);}
+  .nav-links{display:flex;align-items:center;}
+  .nav-links a{padding:0 .75rem;line-height:60px;font-family:var(--font-mono);font-size:.7rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);text-decoration:none;transition:color .2s;white-space:nowrap;}
+  .nav-links a:hover{color:var(--orange);}
+  .hamburger{display:none;flex-direction:column;justify-content:center;gap:5px;background:none;border:none;cursor:pointer;padding:4px;width:36px;height:36px;}
+  .hamburger span{display:block;width:22px;height:2px;background:var(--bone);transition:all .3s;}
+
+  .nav-mobile{display:none;position:fixed;top:60px;left:0;right:0;z-index:99;background:var(--char);border-bottom:1px solid var(--border);max-height:calc(100vh - 60px);overflow-y:auto;}
+  .nav-mobile.open{display:block;}
+  .nav-mobile a{display:block;padding:.85rem 1.5rem;font-family:var(--font-mono);font-size:.8rem;font-weight:600;letter-spacing:.08em;color:var(--muted);text-decoration:none;text-transform:uppercase;border-bottom:1px solid var(--border);transition:color .2s;}
+  .nav-mobile a:hover{color:var(--orange);}
+
+  #progress{position:fixed;top:60px;left:0;right:0;z-index:99;height:3px;background:var(--orange);transform-origin:left;transform:scaleX(0);transition:transform .1s linear;}
+
+  /* COVER */
+  #cover{min-height:100vh;background:var(--graphite);display:grid;place-items:center;padding:6rem 2rem 4rem;position:relative;overflow:hidden;}
+  #cover::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 20% 50%,rgba(246,122,28,0.10) 0%,transparent 60%);pointer-events:none;}
+  .cover-inner{max-width:1200px;width:100%;}
+  .cover-title{font-family:var(--font-display);font-weight:900;line-height:.95;}
+  .cover-title .line-white{font-size:clamp(2.6rem,9.5vw,8.5rem);color:var(--bone);display:block;}
+  .cover-title .line-accent{font-size:clamp(1.5rem,4.4vw,3.6rem);color:var(--orange);display:block;margin-top:.4rem;}
+  .cover-rule{width:100%;height:2px;background:var(--orange);margin:2rem 0;transform:scaleX(0);transform-origin:left;animation:ruleIn .8s .6s cubic-bezier(.16,1,.3,1) forwards;}
+  @keyframes ruleIn{to{transform:scaleX(1);}}
+  .trust-badge{display:inline-flex;align-items:center;gap:10px;background:var(--char);border:1px solid var(--border);border-radius:999px;padding:9px 20px;font-family:var(--font-body);font-size:.85rem;color:var(--bone);margin-bottom:1.5rem;}
+  .trust-dot{width:9px;height:9px;border-radius:50%;background:var(--blue);flex-shrink:0;}
+  .cover-byline{font-family:var(--font-mono);font-size:.7rem;font-weight:600;letter-spacing:.16em;color:#5b6169;text-transform:uppercase;margin-top:.5rem;}
+  .fade-up{opacity:0;transform:translateY(24px);animation:fadeUp .7s cubic-bezier(.16,1,.3,1) forwards;}
+  @keyframes fadeUp{to{opacity:1;transform:none;}}
+  .trust-badge{animation-delay:.2s;}.cover-title{animation-delay:.4s;}.cover-byline{animation-delay:.95s;}
+
+  /* SECTIONS */
+  .content{max-width:1080px;margin:0 auto;padding:0 3rem;}
+  .section{padding:5rem 0 2rem;opacity:0;transform:translateY(32px);transition:opacity .6s ease,transform .6s ease;}
+  .section.visible{opacity:1;transform:none;}
+  .section-header{background:var(--char);border:1px solid var(--border);border-radius:14px;padding:1.1rem 1.5rem;display:flex;align-items:baseline;gap:.75rem;margin-bottom:2rem;}
+  .section-num{font-family:var(--font-mono);font-size:.85rem;font-weight:600;letter-spacing:.1em;color:var(--orange);}
+  .section-title{font-family:var(--font-display);font-size:1.85rem;font-weight:800;letter-spacing:.005em;color:var(--bone);}
+  .section-title .accent{color:var(--orange);}
+  .sub-heading{font-family:var(--font-display);font-size:1.15rem;font-weight:700;color:var(--bone);border-left:4px solid var(--orange);padding-left:.75rem;margin:2rem 0 .85rem;}
+  .accent-label{font-family:var(--font-mono);font-size:.72rem;font-weight:600;letter-spacing:.14em;color:var(--orange);text-transform:uppercase;margin:1.5rem 0 .5rem;}
+  p{font-size:1.02rem;line-height:1.7;color:var(--bone);margin-bottom:.85rem;}
+  .callout{background:var(--char);border:1px solid var(--border);border-left:4px solid var(--orange);border-radius:10px;padding:1rem 1.25rem;margin:1.5rem 0;}
+  .callout p{color:var(--bone);font-style:italic;margin:0;}
+
+  .term-highlight{background:var(--char);border:1px solid var(--border);border-left:4px solid var(--orange);border-radius:10px;padding:1.1rem 1.35rem;margin:1rem 0 1.5rem;}
+  .term-highlight-tags{display:flex;flex-wrap:wrap;gap:.6rem;}
+  .term-tag{background:var(--border);color:var(--bone);font-family:var(--font-mono);font-size:.78rem;font-weight:600;letter-spacing:.02em;padding:.5rem 1rem;border-radius:6px;white-space:nowrap;border-left:3px solid var(--orange);}
+
+  .bullet-list{list-style:none;margin:.5rem 0 1rem 0;}
+  .bullet-list li{font-size:.98rem;line-height:1.65;color:var(--bone);padding:.25rem 0 .25rem 1.4rem;position:relative;}
+  .bullet-list li::before{content:'–';position:absolute;left:0;color:var(--orange);font-weight:700;}
+  .bullet-list.compact li{padding:.18rem 0 .18rem 1.4rem;}
+
+  .term-block{margin:1rem 0 1.5rem;}
+  .term-block-label{font-family:var(--font-mono);font-size:.72rem;font-weight:600;letter-spacing:.14em;color:var(--blue);text-transform:uppercase;margin-bottom:.4rem;}
+
+  /* COMMENTS (per section) */
+  .section-comment-btn{display:inline-flex;align-items:center;gap:.4rem;margin-top:1.5rem;background:transparent;border:1.5px solid var(--border);border-radius:999px;padding:.45rem .9rem;cursor:pointer;font-family:var(--font-mono);font-size:.74rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);transition:all .2s;}
+  .section-comment-btn:hover{border-color:var(--orange);color:var(--orange);}
+  .section-comment-btn .cb-count{background:var(--orange);color:var(--graphite);font-size:.7rem;font-weight:700;padding:.1rem .4rem;border-radius:999px;min-width:20px;text-align:center;display:none;}
+  .section-comment-btn.has-comments .cb-count{display:inline-block;}
+  .comment-panel{display:none;border:1px solid var(--border);border-radius:10px;background:var(--char);margin-top:.75rem;}
+  .comment-panel.open{display:block;}
+  .comment-panel-inner{padding:1.25rem;}
+  .comment-item{border-left:3px solid var(--orange);border-radius:0 6px 6px 0;padding:.75rem 1rem;margin-bottom:.75rem;background:var(--border);}
+  .comment-item-header{display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:.25rem;margin-bottom:.35rem;}
+  .comment-item-name{font-family:var(--font-display);font-weight:700;font-size:.95rem;color:var(--bone);}
+  .comment-item-time{font-size:.72rem;color:var(--muted);}
+  .comment-item-text{font-size:.92rem;line-height:1.6;color:var(--bone);}
+  .no-comments{font-size:.88rem;color:var(--muted);font-style:italic;margin-bottom:1rem;}
+  .comment-form textarea{width:100%;padding:.6rem .75rem;border:1px solid var(--border);border-radius:8px;font-family:var(--font-body);font-size:.92rem;resize:vertical;outline:none;background:var(--graphite);color:var(--bone);display:block;margin-bottom:.5rem;}
+  .comment-form-row{display:flex;gap:.5rem;align-items:center;flex-wrap:wrap;}
+  .comment-form input[type=text]{flex:1;min-width:140px;padding:.5rem .65rem;border:1px solid var(--border);border-radius:8px;font-family:var(--font-body);font-size:.92rem;outline:none;background:var(--graphite);color:var(--bone);}
+  .comment-post-btn{background:var(--orange);color:var(--graphite);border:none;border-radius:999px;padding:.5rem 1.25rem;font-family:var(--font-body);font-size:.88rem;font-weight:600;cursor:pointer;white-space:nowrap;}
+  .comment-post-btn:hover{background:var(--orange-dark);}
+  .comment-post-btn:disabled{opacity:.5;cursor:default;}
+  .comment-status{font-size:.8rem;color:var(--muted);margin-top:.35rem;}
+
+  /* FOOTER */
+  footer{background:var(--char);border-top:1px solid var(--border);padding:4rem 3rem;display:flex;justify-content:center;align-items:center;}
+  .ftr-mark{width:120px;height:auto;margin:0 auto 1rem;display:block;}
+  .footer-claim{font-family:var(--font-display);font-size:clamp(1.5rem,4vw,2.4rem);font-weight:900;color:var(--orange);margin-bottom:.6rem;}
+  .footer-label{font-family:var(--font-mono);font-size:.74rem;font-weight:600;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);}
+
+  /* ================= TRACKER ================= */
+  .tk-phase{margin-bottom:2.5rem;}
+  .tk-phase-hdr{display:flex;align-items:center;gap:1rem;margin-bottom:.35rem;}
+  .tk-phase-rule{flex:1;height:1px;background:var(--border);}
+  .tk-phase-pill{background:var(--graphite);border:1px solid var(--border);border-radius:999px;padding:.5rem 1.25rem;flex-shrink:0;}
+  .tk-phase-lbl{font-family:var(--font-mono);font-size:.76rem;font-weight:600;letter-spacing:.12em;color:var(--bone);text-transform:uppercase;}
+  .tk-phase-count{font-family:var(--font-mono);font-size:.7rem;color:var(--orange);text-align:center;margin-bottom:1rem;letter-spacing:.08em;}
+
+  .tk-progress-wrap{background:var(--char);border:1px solid var(--border);border-radius:12px;padding:1.1rem 1.4rem;margin-bottom:2rem;display:flex;align-items:center;gap:1.25rem;flex-wrap:wrap;}
+  .tk-progress-stat{font-family:var(--font-display);font-size:1.5rem;font-weight:900;color:var(--bone);white-space:nowrap;}
+  .tk-progress-stat span{color:var(--orange);}
+  .tk-progress-track{flex:1;min-width:160px;height:8px;background:var(--border);border-radius:4px;overflow:hidden;}
+  .tk-progress-fill{height:100%;background:var(--orange);border-radius:4px;transition:width .5s ease;}
+  .tk-progress-lbl{font-family:var(--font-mono);font-size:.7rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);}
+
+  .tk-body-mobile{display:flex;flex-direction:column;gap:.85rem;}
+  .tk-card{background:var(--char);border:1px solid var(--border);border-radius:12px;padding:1.1rem 1.25rem 1.25rem;}
+  .tk-card-top{display:flex;justify-content:space-between;align-items:flex-start;gap:1rem;padding-bottom:.9rem;border-bottom:1px solid var(--border);margin-bottom:1rem;}
+  .tk-action-wrap{flex:1;min-width:0;}
+  .tk-action{font-size:1rem;font-weight:700;line-height:1.4;color:var(--bone);}
+  .tk-action.hidden{display:none;}
+  .tk-card-controls{display:flex;align-items:center;gap:.5rem;flex-shrink:0;}
+  .tk-icon-btn{position:relative;background:var(--graphite);border:1px solid var(--border);border-radius:8px;width:34px;height:34px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--muted);flex-shrink:0;transition:all .15s;}
+  .tk-icon-btn:hover{border-color:var(--orange);color:var(--orange);}
+  .tk-icon-btn.has-comments{color:var(--bone);}
+  .tk-comment-btn{position:relative;background:var(--graphite);border:1px solid var(--border);border-radius:8px;height:34px;padding:0 .65rem;cursor:pointer;display:inline-flex;align-items:center;gap:.35rem;color:var(--muted);flex-shrink:0;transition:all .15s;font-family:var(--font-mono);font-size:.66rem;font-weight:600;letter-spacing:.06em;text-transform:uppercase;white-space:nowrap;}
+  .tk-comment-btn:hover{border-color:var(--orange);color:var(--orange);}
+  .tk-comment-btn.has-comments{color:var(--bone);border-color:#3a3f47;}
+  .tk-badge{position:absolute;top:-7px;right:-7px;background:var(--orange);color:var(--graphite);font-size:.62rem;font-weight:700;border-radius:8px;min-width:16px;height:16px;padding:0 3px;display:flex;align-items:center;justify-content:center;line-height:1;}
+
+  .tk-status-label{font-family:var(--font-mono);font-size:.66rem;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-bottom:.5rem;display:block;}
+  select.tk-status-select{width:100%;display:block;text-align:center;text-align-last:center;-moz-text-align-last:center;padding:.7rem 1rem;border:none;border-radius:10px;font-family:var(--font-display);font-weight:700;font-size:.9rem;cursor:pointer;appearance:none;-webkit-appearance:none;}
+  .tk-status-select.status-pending{background:var(--border);color:var(--muted);}
+  .tk-status-select.status-in-progress{background:rgba(18,115,200,0.16);color:var(--blue);}
+  .tk-status-select.status-complete{background:rgba(246,122,28,0.16);color:var(--orange);}
+
+  .tk-edit-wrap{display:none;margin-top:.4rem;}
+  .tk-edit-wrap.open{display:block;}
+  .tk-edit-textarea{width:100%;padding:.6rem .75rem;border:1.5px solid var(--orange);border-radius:8px;font-family:var(--font-body);font-size:.96rem;line-height:1.5;resize:vertical;outline:none;background:var(--graphite);color:var(--bone);display:block;margin-bottom:.5rem;min-height:64px;}
+  .tk-edit-actions{display:flex;gap:.5rem;}
+  .tk-edit-save{background:var(--orange);color:var(--graphite);border:none;border-radius:999px;padding:.45rem 1.1rem;font-family:var(--font-body);font-size:.8rem;font-weight:600;cursor:pointer;}
+  .tk-edit-save:hover{background:var(--orange-dark);}
+  .tk-edit-save:disabled{opacity:.5;cursor:default;}
+  .tk-edit-cancel{background:transparent;color:var(--muted);border:1.5px solid var(--border);border-radius:999px;padding:.45rem 1.1rem;font-family:var(--font-body);font-size:.8rem;font-weight:600;cursor:pointer;}
+  .tk-edit-cancel:hover{border-color:var(--orange);color:var(--orange);}
+
+  .tk-comment-panel{display:none;margin-top:1rem;padding-top:1rem;border-top:1px solid var(--border);}
+  .tk-comment-panel.open{display:block;}
+  .tk-comment-thread{margin-bottom:.75rem;display:flex;flex-direction:column;gap:.6rem;}
+  .tk-comment-item{border-left:3px solid var(--orange);border-radius:0 6px 6px 0;padding:.6rem .85rem;background:var(--border);}
+  .tk-comment-item-header{display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:.25rem;margin-bottom:.25rem;}
+  .tk-comment-item-name{font-family:var(--font-display);font-weight:700;font-size:.88rem;color:var(--bone);}
+  .tk-comment-item-time{font-size:.7rem;color:var(--muted);}
+  .tk-comment-item-text{font-size:.88rem;line-height:1.55;color:var(--bone);}
+  .tk-no-comments{font-size:.84rem;color:var(--muted);font-style:italic;margin-bottom:.75rem;}
+  .tk-comment-form textarea{width:100%;padding:.55rem .7rem;border:1px solid var(--border);border-radius:8px;font-family:var(--font-body);font-size:.88rem;resize:vertical;outline:none;background:var(--graphite);color:var(--bone);display:block;margin-bottom:.5rem;min-height:52px;}
+  .tk-comment-form-row{display:flex;gap:.5rem;align-items:center;flex-wrap:wrap;}
+  .tk-comment-form input[type=text]{flex:1;min-width:130px;padding:.5rem .6rem;border:1px solid var(--border);border-radius:8px;font-family:var(--font-body);font-size:.88rem;outline:none;background:var(--graphite);color:var(--bone);}
+  .tk-comment-post-btn{background:var(--orange);color:var(--graphite);border:none;border-radius:999px;padding:.5rem 1.1rem;font-family:var(--font-body);font-size:.84rem;font-weight:600;cursor:pointer;white-space:nowrap;}
+  .tk-comment-post-btn:hover{background:var(--orange-dark);}
+  .tk-comment-post-btn:disabled{opacity:.5;cursor:default;}
+  .tk-comment-status{font-size:.78rem;color:var(--muted);margin-top:.3rem;}
+
+  .tk-table-wrap{display:none;}
+  .tk-table{width:100%;border-collapse:collapse;background:var(--char);border:1px solid var(--border);border-radius:12px;overflow:hidden;}
+  .tk-table thead th{background:var(--graphite);color:var(--bone);font-family:var(--font-mono);font-size:.66rem;letter-spacing:.1em;text-transform:uppercase;text-align:left;padding:.75rem 1rem;font-weight:600;}
+  .tk-table thead th.tk-th-center{text-align:center;}
+  .tk-table tbody tr.tk-row{border-top:1px solid var(--border);}
+  .tk-table tbody tr.tk-row:hover{background:var(--border);}
+  .tk-table td{padding:.85rem 1rem;font-size:.92rem;color:var(--bone);vertical-align:middle;}
+  .tk-table td.tk-td-action{font-weight:600;line-height:1.4;}
+  .tk-table td.tk-td-status{width:190px;}
+  .tk-table td.tk-td-comments{width:70px;text-align:center;}
+  .tk-table td.tk-td-edit{width:50px;text-align:center;}
+  .tk-table td.tk-td-delete{width:50px;text-align:center;}
+  .tk-table select.tk-status-select{font-size:.78rem;padding:.5rem .5rem;}
+  .tk-comment-row{display:none;}
+  .tk-comment-row.open{display:table-row;}
+  .tk-comment-row td{padding:0;border-top:none;}
+  .tk-comment-row-inner{padding:1.1rem 1.5rem 1.25rem;background:var(--border);border-top:1px dashed var(--border);}
+
+  .tk-add-form{display:flex;gap:.6rem;margin-top:.75rem;flex-wrap:wrap;}
+  .tk-add-form input{flex:1;min-width:220px;font-family:var(--font-body);font-size:.94rem;padding:.55rem .7rem;border:1px solid var(--border);border-radius:8px;background:var(--graphite);color:var(--bone);}
+  .tk-add-btn{font-family:var(--font-body);font-weight:600;font-size:.84rem;padding:.55rem 1.1rem;border:none;border-radius:999px;cursor:pointer;background:var(--orange);color:var(--graphite);}
+  .tk-add-btn:hover{background:var(--orange-dark);}
+  .tk-add-toggle{margin-top:.9rem;background:none;border:2px dashed var(--border);border-radius:10px;width:100%;padding:.75rem;font-family:var(--font-mono);font-weight:600;letter-spacing:.08em;text-transform:uppercase;font-size:.76rem;color:var(--muted);cursor:pointer;}
+  .tk-add-toggle:hover{border-color:var(--orange);color:var(--orange);}
+
+
+
+  /* EVERYDAYPAKS ADDITIONS */
+  strong{font-weight:700;color:var(--bone);}
+  .minor-heading{font-family:var(--font-display);font-size:1.05rem;font-weight:700;color:var(--bone);margin:1.75rem 0 .45rem;}
+  .sub-bullet-list{list-style:none;margin:.35rem 0 .25rem 0;}
+  .sub-bullet-list li{font-size:.94rem;line-height:1.6;color:var(--bone);padding:.15rem 0 .15rem 1.3rem;position:relative;}
+  .sub-bullet-list li::before{content:'○';position:absolute;left:0;color:var(--muted);font-size:.7rem;top:.42rem;}
+
+  /* statement */
+  .statement{background:var(--char);border:1px solid var(--border);border-radius:16px;padding:1.5rem 1.75rem;margin:1.25rem 0 1.5rem;}
+  .statement-eyebrow{font-family:var(--font-mono);font-size:.74rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--orange);display:block;margin-bottom:.55rem;}
+  .statement-claim{font-family:var(--font-display);font-weight:800;font-size:clamp(1.3rem,3vw,1.75rem);line-height:1.25;color:var(--bone);}
+
+  /* flow chips */
+  .flow{display:flex;flex-wrap:wrap;align-items:center;gap:.55rem;margin:.75rem 0 1.5rem;}
+  .flow-step{background:var(--char);border:1px solid var(--border);border-radius:999px;padding:.5rem 1rem;font-family:var(--font-body);font-size:.92rem;font-weight:600;color:var(--bone);}
+  .flow-sep{font-family:var(--font-mono);font-weight:600;color:var(--orange);font-size:.95rem;}
+
+  /* tags */
+  .tag-row{display:flex;flex-wrap:wrap;gap:.6rem;margin:.6rem 0 1.25rem;}
+  .tag{background:var(--char);border:1px solid var(--border);border-left:3px solid var(--orange);border-radius:8px;padding:.5rem 1rem;font-family:var(--font-mono);font-size:.8rem;font-weight:600;letter-spacing:.04em;color:var(--bone);}
+
+  /* pak components */
+  .pak-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:.85rem;margin:.75rem 0 1.25rem;}
+  .pak-card{background:var(--char);border:1px solid var(--border);border-top:3px solid var(--orange);border-radius:14px;padding:1.1rem 1.15rem;font-size:.95rem;line-height:1.55;color:var(--bone);}
+  .pak-card strong{display:block;font-family:var(--font-display);font-size:1.08rem;font-weight:800;margin-bottom:.3rem;}
+
+  /* pricing ladder */
+  .ladder{display:grid;grid-template-columns:repeat(4,1fr);gap:1.1rem;margin:1rem 0 1.75rem;position:relative;}
+  .ladder-step{background:var(--char);border:1px solid var(--border);border-radius:16px;padding:1.25rem 1.2rem;position:relative;}
+  .ladder-step:not(:last-child)::after{content:'';position:absolute;top:50%;right:-1.1rem;width:1.1rem;height:2px;background:var(--orange);}
+  .ladder-step.goal{border-color:var(--orange);}
+  .ladder-head{font-family:var(--font-mono);font-size:.74rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);line-height:1.6;}
+  .ladder-head .price{display:block;font-family:var(--font-display);font-size:1.9rem;font-weight:900;letter-spacing:0;color:var(--bone);margin-top:.25rem;}
+  .ladder-step:first-child .ladder-head .price{color:var(--orange);}
+  .ladder-desc{font-size:.92rem;line-height:1.55;color:var(--bone);margin-top:.65rem;}
+
+  /* campaign table */
+  .camp-wrap{margin:1rem 0 1.75rem;}
+  .camp-table{width:100%;border-collapse:collapse;background:var(--char);border:1px solid var(--border);border-radius:12px;overflow:hidden;}
+  .camp-table th{background:var(--graphite);font-family:var(--font-mono);font-size:.7rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);text-align:left;padding:.85rem 1rem;}
+  .camp-table td{padding:.95rem 1rem;font-size:.96rem;line-height:1.55;color:var(--bone);border-top:1px solid var(--border);vertical-align:top;}
+  .camp-table td:first-child{font-family:var(--font-display);font-weight:700;width:24%;}
+  .camp-table td:last-child{font-family:var(--font-mono);font-size:.82rem;font-weight:600;letter-spacing:.04em;color:var(--orange);width:17%;}
+
+  /* annual event timeline */
+  .ev-wrap{background:var(--char);border:1px solid var(--border);border-radius:16px;margin:1rem 0 1.75rem;overflow-x:auto;-webkit-overflow-scrolling:touch;}
+  .ev-area{position:relative;min-width:860px;height:390px;margin:0 2.25rem;}
+  .ev-line{position:absolute;left:0;right:0;top:230px;height:3px;background:var(--bone);border-radius:2px;}
+  .ev-node{position:absolute;top:230px;width:13px;height:13px;border-radius:50%;background:var(--bone);transform:translate(-50%,-5px);}
+  .ev-month{position:absolute;top:252px;z-index:2;background:var(--char);padding:2px 6px;transform:translateX(-50%);font-family:var(--font-mono);font-size:.7rem;font-weight:600;letter-spacing:.14em;color:var(--muted);}
+  .ev{position:absolute;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;}
+  .ev-up{bottom:calc(390px - 230px);}
+  .ev-up .ev-stem{width:2px;background:var(--orange);opacity:.55;}
+  .ev-up .ev-dot{width:12px;height:12px;border-radius:50%;background:var(--orange);margin-top:.45rem;}
+  .ev-label{font-family:var(--font-display);font-weight:800;font-size:.95rem;line-height:1.15;color:var(--bone);text-align:center;max-width:120px;}
+  .ev-down{top:233px;}
+  .ev-down .ev-stem{width:2px;background:var(--blue);opacity:.6;height:58px;}
+  .ev-down .ev-dot{width:9px;height:9px;border-radius:50%;background:var(--blue);margin-bottom:.45rem;}
+  .ev-down .ev-label{font-family:var(--font-mono);font-weight:600;font-size:.66rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);max-width:118px;line-height:1.4;}
+  .ev-hint{display:none;font-family:var(--font-mono);font-size:.66rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);padding:.75rem 1rem 0;}
+
+  @media(max-width:900px){
+    .pak-grid{grid-template-columns:repeat(2,1fr);}
+    .ladder{grid-template-columns:repeat(2,1fr);}
+    .ladder-step:nth-child(2)::after{display:none;}
+    .ev-hint{display:block;}
+  }
+  @media(max-width:600px){
+    .pak-grid,.ladder{grid-template-columns:1fr;}
+    .ladder-step::after{display:none;}
+    .camp-table thead{display:none;}
+    .camp-table,.camp-table tbody,.camp-table tr,.camp-table td{display:block;width:100% !important;}
+    .camp-table{background:transparent;border:none;}
+    .camp-table tr{background:var(--char);border:1px solid var(--border);border-radius:12px;margin-bottom:.8rem;padding:.35rem 0;}
+    .camp-table td{border-top:none;padding:.45rem 1rem;}
+    .camp-table td::before{content:attr(data-label);display:block;font-family:var(--font-mono);font-size:.62rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:.15rem;}
+    .camp-table td:first-child{font-size:1.05rem;}
+  }
+
+
+  /* item blocks */
+  .item-blocks{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin:1.5rem 0 1.75rem;}
+  .item-block{background:var(--char);border:1px solid var(--border);border-top:3px solid var(--orange);border-radius:16px;padding:1.35rem 1.35rem 1rem;}
+  .item-block-title{font-family:var(--font-display);font-size:1.12rem;font-weight:800;line-height:1.3;color:var(--bone);margin-bottom:.75rem;padding-bottom:.75rem;border-bottom:1px solid var(--border);}
+  .item-block p{font-size:.97rem;line-height:1.6;}
+  .item-block .bullet-list{margin-bottom:.25rem;}
+  .item-block .bullet-list li{font-size:.94rem;line-height:1.55;}
+  @media(max-width:900px){.item-blocks{grid-template-columns:1fr;}}
+
+  /* RESPONSIVE */
+  @media(max-width:900px){
+    .nav-links{display:none;}
+    .hamburger{display:flex;}
+    .content{padding:0 1.25rem;}
+    nav{padding:0 1.25rem;}
+    footer{padding:3rem 1.25rem;}
+    .section-title{font-size:1.3rem;}
+    #cover{padding:5rem 1.25rem 3rem;}
+  }
+  @media(min-width:901px){
+    .tk-body-mobile{display:none;}
+    .tk-table-wrap{display:block;}
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-brand">EVERYDAYPAKS <span>STRATEGY</span></div>
+  <div class="nav-links">
+    <a href="#s01">Overview</a>
+    <a href="#s02">Pre-Launch</a>
+    <a href="#s03">Growth Areas</a>
+    <a href="#s10">Events</a>
+    <a href="#s11">Advertising</a>
+    <a href="#s12">Creative</a>
+    <a href="#s13">Roadmap</a>
+  </div>
+  <button class="hamburger" onclick="toggleMenu()" id="hbg">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+<div class="nav-mobile" id="navMobile">
+  <a href="#s01" onclick="toggleMenu()">Strategy Overview</a>
+  <a href="#s02" onclick="toggleMenu()">Pre-Launch Foundation</a>
+  <a href="#s03" onclick="toggleMenu()">Growth Area 1: Own the Daily Pak Format</a>
+  <a href="#s04" onclick="toggleMenu()">Growth Area 2: Build Trust &amp; Social Proof</a>
+  <a href="#s05" onclick="toggleMenu()">Growth Area 3: Build Search Visibility &amp; a Strong Listing</a>
+  <a href="#s06" onclick="toggleMenu()">Growth Area 4: Use Pricing to Support the Launch</a>
+  <a href="#s07" onclick="toggleMenu()">Growth Area 5: Build the Subscriber Base</a>
+  <a href="#s08" onclick="toggleMenu()">Growth Area 6: Expand Reach Through Creator Connections</a>
+  <a href="#s09" onclick="toggleMenu()">Growth Area 7: Use Video to Educate &amp; Convert</a>
+  <a href="#s10" onclick="toggleMenu()">Growth Area 8: Plan Around Key Amazon Events</a>
+  <a href="#s11" onclick="toggleMenu()">Advertising Strategy</a>
+  <a href="#s12" onclick="toggleMenu()">Creative Strategy</a>
+  <a href="#s13" onclick="toggleMenu()">Roadmap</a>
+</div>
+<div id="progress"></div>
+
+<!-- COVER -->
+<section id="cover">
+  <div class="cover-inner">
+    <div class="trust-badge fade-up"><span class="trust-dot"></span>Trusted by 120+ brands for Amazon and Walmart growth.</div>
+    <div class="cover-title fade-up">
+      <span class="line-white">EverydayPaks</span>
+      <span class="line-accent">Amazon Launch Strategy</span>
+    </div>
+    <div class="cover-rule"></div>
+    <p class="cover-byline fade-up">Prepared by FTR &nbsp;·&nbsp; Amazon &amp; Walmart Growth</p>
+  </div>
+</section>
+
+<!-- S01 — STRATEGY OVERVIEW -->
+<div class="section" id="s01">
+  <div class="content">
+    <div class="section-header"><span class="section-title">Strategy Overview</span></div>
+
+    <p>EverydayPaks is entering Amazon with a strong opportunity to stand out in the GLP-1 support category through a product format that is simple, transparent, and built for everyday use.</p>
+    <p>The initial focus is to successfully launch the GLP-1 Support Pak, establish trust and visibility, and build a strong foundation for repeat purchase and Subscribe &amp; Save.</p>
+
+    <div class="sub-heading">Launch Priorities</div>
+    <ul class="bullet-list">
+      <li>Own the Daily Pak format as the key point of difference.</li>
+      <li>Build trust and social proof for a new brand with no existing Amazon history.</li>
+      <li>Launch with strong SEO, clear product education, and conversion-focused creative.</li>
+      <li>Use pricing strategically to support the launch while the brand builds trust.</li>
+      <li>Build toward Subscribe &amp; Save and long-term retention, not just one-time orders.</li>
+      <li>Use the first 90 days to learn, optimize, and prepare for the next stage of growth.</li>
+    </ul>
+
+    <div class="statement">
+      <span class="statement-eyebrow">Core Brand Message:</span>
+      <div class="statement-claim">One Pak. One Time. Everyday.</div>
+    </div>
+
+    <div id="comments-s01"></div>
+  </div>
+</div>
+
+<!-- S02 — PRE-LAUNCH FOUNDATION -->
+<div class="section" id="s02">
+  <div class="content">
+    <div class="section-header"><span class="section-title">Pre-Launch Foundation</span></div>
+
+    <p>Complete the key account, compliance, and inventory requirements before launch to avoid preventable delays.</p>
+
+    <div class="sub-heading">Brand Registry</div>
+    <ul class="bullet-list">
+      <li>Apply for Amazon Brand Registry using the pending EP EVERYDAYPAKS trademark.</li>
+      <li>Prepare clear, real-life product photos showing the EverydayPaks branding for Brand Registry verification.</li>
+    </ul>
+
+    <div class="sub-heading">Supplement Compliance</div>
+    <p>Prepare for Amazon dietary supplement verification ahead of launch:</p>
+    <ul class="bullet-list">
+      <li>Current accredited third-party cGMP certification.</li>
+      <li>Existing COAs and product testing reports.</li>
+      <li>Final product label and clear real-life product photos.</li>
+      <li>If Amazon triggers verification, initiate it directly through Seller Central and complete validation/testing through an Amazon-authorized TIC provider, such as Eurofins.</li>
+      <li>Account for potential testing costs and lead time in the launch timeline.</li>
+    </ul>
+
+    <div id="comments-s02"></div>
+  </div>
+</div>
+
+<!-- S03 — GROWTH AREA 1 -->
+<div class="section" id="s03">
+  <div class="content">
+    <div class="section-header"><span class="section-title"><span class="accent">Growth Area 1:</span> Own the Daily Pak Format</span></div>
+
+    <p>The Daily Pak format should be one of the biggest points of difference for EverydayPaks.</p>
+    <p>Instead of buying, storing, sorting, and remembering multiple supplement bottles, the customer gets their daily routine together in one pre-portioned Pak.</p>
+
+    <div class="sub-heading">Key Recommendations</div>
+
+    <div class="minor-heading">Make simplicity the hero.</div>
+    <p>Build the positioning around:</p>
+    <div class="flow"><span class="flow-step">One Pak</span><span class="flow-sep">→</span><span class="flow-step">One Daily Routine</span><span class="flow-sep">→</span><span class="flow-step">Less Sorting</span><span class="flow-sep">→</span><span class="flow-step">Less Clutter</span><span class="flow-sep">→</span><span class="flow-step">Less to Remember</span></div>
+    <p>Lean into the brand's existing language:</p>
+    <ul class="bullet-list">
+      <li>One Pak. One Time. Everyday.</li>
+      <li>Simple on purpose.</li>
+      <li>One less thing to think about.</li>
+      <li>Grab it. Take it. Get on with your day.</li>
+      <li>Less clutter. Less sorting. Less overthinking.</li>
+    </ul>
+
+    <div class="minor-heading">Make travel part of the story.</div>
+    <p>Going away for two days? Take two Paks.</p>
+    <p>Show how the format removes the need to travel with multiple supplement bottles and makes it easier to stay consistent away from home.</p>
+
+    <div class="minor-heading">Own the format visually.</div>
+    <p>The Daily Pak gives us an opportunity to look different in search results.</p>
+    <p>Explore a main image that makes the individual Pak and product format immediately recognizable rather than blending into a category dominated by traditional supplement packaging.</p>
+    <p>Carry the Daily Pak visual identity through the image stack, Premium A+, Store, video, and advertising.</p>
+
+    <div id="comments-s03"></div>
+  </div>
+</div>
+
+<!-- S04 — GROWTH AREA 2 -->
+<div class="section" id="s04">
+  <div class="content">
+    <div class="section-header"><span class="section-title"><span class="accent">Growth Area 2:</span> Build Trust &amp; Social Proof</span></div>
+
+    <p>EverydayPaks will launch as a completely new brand with no Amazon sales history, reviews, or existing customer recognition.</p>
+    <p>Building trust quickly will be critical. We need to give customers enough confidence in both the product itself and the brand behind it to try something new.</p>
+    <p>The goal is to build trust from multiple directions:</p>
+    <div class="flow"><span class="flow-step">Product Transparency &amp; Trust Signals</span><span class="flow-sep">→</span><span class="flow-step">Early Social Proof</span><span class="flow-sep">→</span><span class="flow-step">Creator Content &amp; UGC</span><span class="flow-sep">→</span><span class="flow-step">Product Insert</span><span class="flow-sep">→</span><span class="flow-step">Ongoing Review Generation</span></div>
+
+    <div class="sub-heading">Key Recommendations</div>
+
+    <div class="minor-heading">Build trust directly into the listing.</div>
+    <p>The listing itself needs to do as much of the trust-building work as possible from Day 1.</p>
+    <p>Use the Daily Pak format to clearly show exactly what customers are taking and what each component is there to support:</p>
+    <div class="pak-grid">
+      <div class="pak-card"><strong>Foundation Blend</strong>— Multivitamin + mineral support.</div>
+      <div class="pak-card"><strong>Metabolic Balance</strong>— Metabolic wellness support.</div>
+      <div class="pak-card"><strong>Recharge</strong>— B12 support.</div>
+      <div class="pak-card"><strong>Gut Balance</strong>— Probiotic support.</div>
+    </div>
+    <p>Use the image stack, Premium A+, video, and Store to visually open the Pak and explain the components.</p>
+    <p>Pair this transparency with every substantiated quality and trust signal available. Current packaging already includes:</p>
+    <div class="tag-row"><span class="tag">Non-GMO</span><span class="tag">Gluten-Free</span><span class="tag">No Added Hormones</span><span class="tag">cGMP Compliant</span></div>
+    <p>The goal is for customers to quickly understand what they're taking, why it's there, and why they can feel confident in the product.</p>
+
+    <div class="item-blocks">
+      <div class="item-block">
+        <div class="item-block-title">Leverage the Existing Company Network for Early Social Proof</div>
+        <p>Use the company's existing network to build initial product awareness, encourage early purchases, and help establish credibility during launch.</p>
+        <ul class="bullet-list">
+          <li>Ensure all purchases and review-related activities comply with Amazon's policies.</li>
+          <li>Guidelines will be provided on how to approach this compliantly and effectively.</li>
+        </ul>
+      </div>
+      <div class="item-block">
+        <div class="item-block-title">Expand social proof through Creator Connections and UGC.</div>
+        <p>Once the listing has established initial traction and customer reviews, leverage Creator Connections and user-generated content (UGC) to build credibility and increase product visibility.</p>
+        <ul class="bullet-list">
+          <li>Activate Creator Connections to encourage creators to showcase, demonstrate, and talk about the product.</li>
+          <li>Use authentic creator content to reinforce product benefits, transparency, and customer trust.</li>
+        </ul>
+      </div>
+      <div class="item-block">
+        <div class="item-block-title">Use the product insert to support the post-purchase experience.</div>
+        <p>Use the planned product insert to continue the brand experience after purchase and include an Amazon-compliant review request to support review growth as order volume builds.</p>
+      </div>
+    </div>
+
+    <div class="callout"><p>The goal is to build enough trust around the product from Day 1 that the launch does not depend on having a large number of Amazon reviews to convert.</p></div>
+
+    <div id="comments-s04"></div>
+  </div>
+</div>
+
+<!-- S05 — GROWTH AREA 3 -->
+<div class="section" id="s05">
+  <div class="content">
+    <div class="section-header"><span class="section-title"><span class="accent">Growth Area 3:</span> Build Search Visibility &amp; a Strong Listing</span></div>
+
+    <p>The launch listing needs to do two things well from Day 1:</p>
+    <div class="statement"><div class="statement-claim">Get found + convert the traffic we generate.</div></div>
+    <p>EverydayPaks should launch with a fully optimized, conversion-ready PDP. We do not want to drive launch traffic to an incomplete listing and add core content later.</p>
+
+    <div class="sub-heading">Key Recommendations</div>
+
+    <div class="minor-heading">Complete full Amazon SEO research.</div>
+    <p>Build the listing around:</p>
+    <ul class="bullet-list">
+      <li>Highest-value GLP-1 support searches.</li>
+      <li>Relevant nutritional support searches.</li>
+      <li>Ingredient searches.</li>
+      <li>High-intent long-tail opportunities.</li>
+      <li>Competitor keyword gaps.</li>
+      <li>Relevant customer needs/search behavior where compliant.</li>
+    </ul>
+    <p>Apply SEO across the full listing:</p>
+    <div class="flow"><span class="flow-step">Title</span><span class="flow-sep">→</span><span class="flow-step">Bullets</span><span class="flow-sep">→</span><span class="flow-step">Attributes</span><span class="flow-sep">→</span><span class="flow-step">Backend Search Terms</span><span class="flow-sep">→</span><span class="flow-step">Images</span><span class="flow-sep">→</span><span class="flow-step">Premium A+</span><span class="flow-sep">→</span><span class="flow-step">Advertising</span></div>
+
+    <div class="minor-heading">Make the product easy for Amazon to understand.</div>
+    <p>Fully complete relevant attributes and structure the content so Amazon can clearly understand:</p>
+    <ul class="bullet-list">
+      <li>What the product is.</li>
+      <li>Who it is for.</li>
+      <li>What's inside each Pak.</li>
+      <li>What each component supports.</li>
+      <li>How it is used.</li>
+      <li>What makes the format different.</li>
+    </ul>
+    <p>This should support both traditional Amazon search and Amazon's AI-assisted shopping experiences.</p>
+
+    <div class="minor-heading">Treat the SERP as one package.</div>
+    <p>Optimize:</p>
+    <div class="flow"><span class="flow-step">Main Image</span><span class="flow-sep">+</span><span class="flow-step">Title</span><span class="flow-sep">+</span><span class="flow-step">Price/Offer</span><span class="flow-sep">+</span><span class="flow-step">Reviews</span></div>
+    <p>The Daily Pak format should be a major part of the visual strategy and help EverydayPaks stand out before the shopper even reaches the PDP.</p>
+
+    <div class="sub-heading">Launch — Fully Optimized PDP</div>
+    <p>Launch with:</p>
+    <ul class="bullet-list">
+      <li>Fully optimized front-end copy and SEO.</li>
+      <li>Complete backend search terms and relevant attributes.</li>
+      <li>Full conversion-focused image stack.</li>
+      <li>Premium A+ Content.</li>
+      <li>Brand Story.</li>
+      <li>Mobile-optimized content across the PDP.</li>
+    </ul>
+    <p>The entire PDP should be built as one connected conversion experience, with consistent positioning, messaging, SEO, product education, and trust signals throughout.</p>
+
+    <div class="sub-heading">Phase 2 — Expand the Brand Experience</div>
+    <p>Once the core PDP is live:</p>
+    <ul class="bullet-list">
+      <li>Build the Amazon Storefront.</li>
+      <li>Add educational/product video.</li>
+      <li>Expand UGC and creator content as assets become available.</li>
+      <li>Continue optimizing the PDP based on actual search, CTR, conversion, and customer behavior.</li>
+    </ul>
+
+    <div id="comments-s05"></div>
+  </div>
+</div>
+
+<!-- S06 — GROWTH AREA 4 -->
+<div class="section" id="s06">
+  <div class="content">
+    <div class="section-header"><span class="section-title"><span class="accent">Growth Area 4:</span> Use Pricing to Support the Launch</span></div>
+
+    <p>EverydayPaks will launch as a new brand without established Amazon reviews or customer recognition.</p>
+    <p>Starting at $19.99 makes it easier for customers to give a new product and brand a try while we build initial sales, reviews, and conversion history.</p>
+    <p>From there, we will gradually test higher price points as the product builds stronger ratings, more reviews, and stable conversion.</p>
+
+    <div class="sub-heading">Pricing Roadmap</div>
+    <div class="ladder">
+      <div class="ladder-step">
+        <div class="ladder-head">LAUNCH &amp; LEARN — <span class="price">$19.99</span></div>
+        <div class="ladder-desc">Build initial sales, reviews, rating, and conversion history.</div>
+      </div>
+      <div class="ladder-step">
+        <div class="ladder-head">FIRST PRICE TEST — <span class="price">$21.99</span></div>
+        <div class="ladder-desc">Test the first increase once the product has built stronger social proof and conversion supports moving the price up.</div>
+      </div>
+      <div class="ladder-step">
+        <div class="ladder-head">CONTINUE TESTING — <span class="price">$22.99</span></div>
+        <div class="ladder-desc">Continue increasing gradually while monitoring the impact on rating/reviews, conversion, sales, and advertising performance.</div>
+      </div>
+      <div class="ladder-step goal">
+        <div class="ladder-head">IDEAL EVERYDAY PRICE — <span class="price">$24.99</span></div>
+        <div class="ladder-desc">Work toward $24.99 if the product has built enough trust and Amazon performance supports it.</div>
+      </div>
+    </div>
+
+    <div class="sub-heading">How We'll Make Pricing Decisions</div>
+    <p>Price increases will not be tied to a fixed timeline.</p>
+    <p>Before moving to the next price point, we will look at:</p>
+    <ul class="bullet-list">
+      <li><strong>Rating &amp; Reviews</strong> — Has the product built enough social proof to support a higher price?</li>
+      <li><strong>Conversion</strong> — Is the listing converting strongly and consistently?</li>
+      <li><strong>Sales</strong> — Are we maintaining healthy sales as the brand establishes itself?</li>
+      <li><strong>Advertising Performance</strong> — Can we continue acquiring customers efficiently at the new price?</li>
+      <li><strong>Margin</strong> — Does the change improve the overall economics without hurting growth?</li>
+      <li><strong>Subscribe &amp; Save</strong> — Are we successfully turning new customers into subscribers?</li>
+    </ul>
+    <p>$24.99 is the ideal everyday price we want to work toward, but actual Amazon performance will determine where the final price lands and how quickly we get there.</p>
+    <div class="callout"><p>This pricing approach supports the broader launch strategy: build trust first, then ask the customer to pay more as that trust and performance strengthen.</p></div>
+
+    <div id="comments-s06"></div>
+  </div>
+</div>
+
+<!-- S07 — GROWTH AREA 5 -->
+<div class="section" id="s07">
+  <div class="content">
+    <div class="section-header"><span class="section-title"><span class="accent">Growth Area 5:</span> Build the Subscriber Base</span></div>
+
+    <p>This is a daily-use product. Long-term success should therefore be measured not only by how many customers we acquire, but by how many customers stay with the product.</p>
+
+    <div class="sub-heading">Key Recommendations</div>
+
+    <div class="minor-heading">Build Subscribe &amp; Save into the strategy from the beginning.</div>
+    <p>Once eligible:</p>
+    <ul class="bullet-list">
+      <li>Enroll in Subscribe &amp; Save.</li>
+      <li>Start with a 10% discount.</li>
+      <li>Add a first-order Subscribe &amp; Save coupon when eligible to support subscriber acquisition.</li>
+    </ul>
+
+    <div class="minor-heading">Support subscription through the listing.</div>
+    <p>Build messaging around:</p>
+    <div class="flow"><span class="flow-step">Daily Product</span><span class="flow-sep">→</span><span class="flow-step">Daily Habit</span><span class="flow-sep">→</span><span class="flow-step">Easy Replenishment</span></div>
+    <p>The goal is to make Subscribe &amp; Save feel like the natural way to buy the product.</p>
+
+    <div class="minor-heading">Learn the customer lifecycle.</div>
+    <p>We don't yet know what the real customer lifecycle looks like.</p>
+    <p>Use repeat behavior, subscriber retention, reviews, and customer feedback to understand how customers experience the product over time.</p>
+    <p>As that intelligence builds, expand the content to communicate the value of consistent use.</p>
+    <p>Potential future visual:</p>
+    <div class="flow"><span class="flow-step">1 Month</span><span class="flow-sep">→</span><span class="flow-step">3 Months</span><span class="flow-sep">→</span><span class="flow-step">6 Months</span></div>
+
+    <div class="statement">
+      <span class="statement-eyebrow">Long-Term Goal:</span>
+      <div class="statement-claim">Don't just sell the product. Build the habit.</div>
+    </div>
+
+    <div id="comments-s07"></div>
+  </div>
+</div>
+
+<!-- S08 — GROWTH AREA 6 -->
+<div class="section" id="s08">
+  <div class="content">
+    <div class="section-header"><span class="section-title"><span class="accent">Growth Area 6:</span> Expand Reach Through Creator Connections</span></div>
+
+    <p>Creator Connections should be part of the growth strategy, but not from Day 1.</p>
+    <p>First establish some social proof and a healthy listing so creators are evaluating a product that already has customer validation.</p>
+
+    <div class="sub-heading">Rollout</div>
+    <div class="flow"><span class="flow-step">Launch</span><span class="flow-sep">→</span><span class="flow-step">Initial Sales &amp; Social Proof</span><span class="flow-sep">→</span><span class="flow-step">Healthy Rating/CVR</span><span class="flow-sep">→</span><span class="flow-step">Creator Connections</span><span class="flow-sep">→</span><span class="flow-step">Scale</span></div>
+
+    <div class="sub-heading">Key Recommendations</div>
+    <p>Once the listing has established an initial foundation:</p>
+    <ul class="bullet-list">
+      <li>Launch Creator Connections.</li>
+      <li>Monitor creator participation and attributed performance.</li>
+      <li>Identify the strongest creator angles and scale what works.</li>
+      <li>Build a growing library of creator content and UGC that can further support product visibility and trust.</li>
+    </ul>
+    <p>The Daily Pak format gives creators plenty to work with:</p>
+    <ul class="bullet-list">
+      <li>What's inside my Pak.</li>
+      <li>Morning routine.</li>
+      <li>Opening and explaining the components.</li>
+      <li>No bottle sorting.</li>
+      <li>Work/on-the-go use.</li>
+      <li>Weekend/travel routine.</li>
+      <li>Everyday consistency.</li>
+    </ul>
+    <p>Creator content should reinforce the same core positioning as the listing rather than creating a separate product story.</p>
+    <p>Creator Connections should support both reach and trust - getting the product in front of new customers while building more social proof around how EverydayPaks fits into real everyday routines.</p>
+
+    <div id="comments-s08"></div>
+  </div>
+</div>
+
+<!-- S09 — GROWTH AREA 7 -->
+<div class="section" id="s09">
+  <div class="content">
+    <div class="section-header"><span class="section-title"><span class="accent">Growth Area 7:</span> Use Video to Educate &amp; Convert</span></div>
+
+    <p>Use video to quickly show customers what EverydayPaks is, what's inside each Pak, and how easily it fits into an everyday routine.</p>
+    <p>Prioritize:</p>
+    <ul class="bullet-list">
+      <li>What's inside the Daily Pak and what each component supports.</li>
+      <li>How to use it.</li>
+      <li>Everyday routine and convenience.</li>
+      <li>Travel/on-the-go use.</li>
+      <li>Product, formula, and quality education.</li>
+    </ul>
+    <p>Use video across the PDP, Premium A+, Store, and advertising where relevant.</p>
+
+    <div id="comments-s09"></div>
+  </div>
+</div>
+
+<!-- S10 — GROWTH AREA 8 -->
+<div class="section" id="s10">
+  <div class="content">
+    <div class="section-header"><span class="section-title"><span class="accent">Growth Area 8:</span> Plan Around Key Amazon Events</span></div>
+
+    <div class="sub-heading">New Year / New You</div>
+    <p>January is a strong fit for EverydayPaks and should be the first major seasonal opportunity we plan around.</p>
+    <p>The message does not need to become aggressive weight-loss messaging. Instead, lean into:</p>
+    <div class="statement"><div class="statement-claim">New Year. Simpler Routine.</div></div>
+    <p>Connect the New Year period with:</p>
+    <ul class="bullet-list">
+      <li>Starting a simpler daily routine.</li>
+      <li>Building consistency.</li>
+      <li>Less supplement clutter.</li>
+      <li>Making wellness easier to stick with.</li>
+      <li>One Pak. One Time. Everyday.</li>
+    </ul>
+    <p>Prepare seasonal creative ahead of January and use it across relevant listing content, Store, and advertising.</p>
+
+    <div class="sub-heading">January Offer — TBD</div>
+    <p>Do not commit to a promotion yet.</p>
+    <p>The offer should depend on:</p>
+    <ul class="bullet-list">
+      <li>Actual launch date.</li>
+      <li>Current pricing stage.</li>
+      <li>Review strength.</li>
+      <li>Conversion.</li>
+      <li>Margin.</li>
+      <li>Promotional eligibility.</li>
+    </ul>
+    <p>If we're still building at $19.99, we may not need another discount.</p>
+    <p>If we've progressed toward $22.99–$24.99, evaluate whether a January offer gives us an additional acquisition opportunity.</p>
+
+    <div class="sub-heading">Annual Amazon Event Plan</div>
+    <div class="ev-wrap">
+      <div class="ev-hint">Swipe to see the full year →</div>
+      <div class="ev-area" id="evArea"></div>
+    </div>
+
+    <div id="comments-s10"></div>
+  </div>
+</div>
+
+<!-- S11 — ADVERTISING STRATEGY -->
+<div class="section" id="s11">
+  <div class="content">
+    <div class="section-header"><span class="section-title">Advertising Strategy</span></div>
+
+    <div class="sub-heading">Goal</div>
+    <p>Get the GLP-1 Support Pak its first sales and reviews, then build rank for "glp 1 support supplement" and related terms, while keeping launch spend capped.</p>
+
+    <div class="sub-heading">Where we are starting</div>
+    <ul class="bullet-list">
+      <li>No ASIN, reviews or sales history yet. The seller account is still being set up.</li>
+      <li>Good market to enter: about 325K monthly searches across 154 relevant keywords</li>
+      <li>We add campaigns in steps as reviews grow and scale only when the data supports it.</li>
+    </ul>
+
+    <div class="sub-heading">Campaigns we will build</div>
+    <p>Weeks below count from go live. One ad group per campaign, 5 to 10 targets each. Budgets are starting caps for client approval.</p>
+    <div class="camp-wrap">
+      <table class="camp-table">
+        <thead><tr><th>Campaign</th><th>What it does and what it targets</th><th>Starts</th></tr></thead>
+        <tbody>
+          <tr><td data-label="Campaign">SP Exact: core</td><td data-label="What it does and what it targets">Main launch campaign. Top 5 "glp-1 support" terms such as glp-1 support supplement and glp 1 support. Top of Search +20 to 30%.</td><td data-label="Starts">Week 1</td></tr>
+          <tr><td data-label="Campaign">SP Auto: low bid</td><td data-label="What it does and what it targets">Discovery. Kept at low bids so it finds search terms without bleeding budget. Winners move into Exact; waste gets negated.</td><td data-label="Starts">Week 1</td></tr>
+          <tr><td data-label="Campaign">SP Phrase: discovery</td><td data-label="What it does and what it targets">Wider net around the core and vitamin terms</td><td data-label="Starts">Week 1</td></tr>
+          <tr><td data-label="Campaign">SP Product Targeting: offense</td><td data-label="What it does and what it targets">Competitor product pages: Youtheory (B0DF84PYBM) and Replenza (B0DJ1VMZHW). Nature Made later and only as a small test.</td><td data-label="Starts">Week 1 (push after more reviews)</td></tr>
+          <tr><td data-label="Campaign">SP Product Targeting: defense</td><td data-label="What it does and what it targets">Our own product pages, so competitors do not show up on our listing.</td><td data-label="Starts">Week 1</td></tr>
+          <tr><td data-label="Campaign">SBV (Sponsored Brands Video)</td><td data-label="What it does and what it targets">Video ads on core and vitamin keywords, plus brand terms. Needs Brand Registry and a video that sticks to approved claims.</td><td data-label="Starts">Week 1-2</td></tr>
+          <tr><td data-label="Campaign">SP Exact: vitamin and audience</td><td data-label="What it does and what it targets">Terms like glp1 vitamins, glp 1 vitamin support, vitamins for glp1 users women. Best fit for the multivitamin, B12 and probiotic pack.</td><td data-label="Starts">Week 2-3</td></tr>
+          <tr><td data-label="Campaign">SP Exact: supplement family</td><td data-label="What it does and what it targets">Higher-volume, higher-CPC terms such as glp1 supplement and glp-1 supplement. Added once core Exact shows orders.</td><td data-label="Starts">Week 2-3</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="sub-heading">How we will run them</div>
+    <ul class="bullet-list">
+      <li>Week 1 to 2: watch spend daily, negate off topic terms</li>
+      <li>Week 3 to 4: tune placements and bids on the core campaign, and review impression share.</li>
+      <li>Day 30 review: scale only if the rating is 4.0+ and TACOS is moving toward target. If not, we fix the listing or price before adding spend.</li>
+    </ul>
+
+    <div class="sub-heading">Things to know</div>
+    <ul class="bullet-list">
+      <li>Expect a high ACOS at launch, so launch spend is an investment and stays capped.</li>
+    </ul>
+
+    <div class="sub-heading">What we need</div>
+    <ul class="bullet-list">
+      <li>Final price and COGS sheet (to set the ACOS, TACOS we can afford)</li>
+    </ul>
+
+    <div id="comments-s11"></div>
+  </div>
+</div>
+
+<!-- S12 — CREATIVE STRATEGY -->
+<div class="section" id="s12">
+  <div class="content">
+    <div class="section-header"><span class="section-title">Creative Strategy</span></div>
+
+    <p>Creative should support the same core story throughout Amazon:</p>
+    <div class="flow"><span class="flow-step">Daily Pak</span><span class="flow-sep">→</span><span class="flow-step">Simplicity</span><span class="flow-sep">→</span><span class="flow-step">Transparency</span><span class="flow-sep">→</span><span class="flow-step">Trust</span><span class="flow-sep">→</span><span class="flow-step">Everyday Routine</span></div>
+
+    <div class="sub-heading">Priority areas:</div>
+    <ul class="bullet-list">
+      <li>Make the Daily Pak visually distinctive
+        <ul class="sub-bullet-list">
+          <li>We can do this through developing a solid main image that stands out from competitors on SERP - showing the paks and exactly what’s inside will help separate us from competitors</li>
+          <li>Inclusion of a badge (e.g.competitor Etta Vita uses “made in the USA” badge) will also help build trust</li>
+        </ul>
+      </li>
+      <li>Image stack should clearly emphasize key USPs within first 3 images (where most consumers convert)</li>
+      <li>Tile to explain the role of each component</li>
+      <li>Demonstrate ease of use through generated lifestyle imagery - allowing the consumer to envision themselves incorporating the product into their daily lives</li>
+      <li>Show travel/portability through imagery</li>
+      <li>Surface quality/trust signals
+        <ul class="sub-bullet-list">
+          <li>Good UGC can be included in the A+ content for social proof</li>
+        </ul>
+      </li>
+      <li>Build mobile-first as this is where most consumers shop - we will also develop separate desktop imagery to ensure consumers have a quality experience on both formats</li>
+      <li>Support video and educational content
+        <ul class="sub-bullet-list">
+          <li>Video leads to much higher conversion - UGC is beneficial but branded educational content is incredibly valuable to further educate the consumer on ‘why THIS product’ and any more scientific-led information</li>
+        </ul>
+      </li>
+      <li>Prepare adaptable New Year creative to target the ‘New Year, New You’ audience</li>
+      <li>Ensure the consumer journey is a seamless, simple to digest experience - from the image stack, to A+ content, brand story and storefront. This should easily guide consumers who require further information before making their purchase decision</li>
+      <li>Utilize cross-selling elements when additional products are available</li>
+      <li>Once subscribe and save is available, we will incorporate this in the imagery across all elements to encourage subscriptions and repeat purchase</li>
+    </ul>
+
+    <div id="comments-s12"></div>
+  </div>
+</div>
+
+<!-- S13 — ROADMAP -->
+<div class="section" id="s13">
+  <div class="content">
+    <div class="section-header"><span class="section-title">Roadmap</span></div>
+
+    <div id="trackerRoot"></div>
+
+    <div id="comments-s13"></div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div style="text-align:center;width:100%;">
+    <svg class="ftr-mark" viewBox="0 0 8215.72 788.72" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="FTR"><g fill="#F2F4F6"><path d="M162 244V401H441V244ZM213 0H51V681H489V524H152L213 595Z" transform="translate(-10.14 734.86) scale(1 -1)"/><path d="M18 340Q18 418 43.0 482.5Q68 547 114.5 594.5Q161 642 225.5 668.0Q290 694 367 694Q444 694 508.5 668.0Q573 642 620.0 594.5Q667 547 692.0 482.5Q717 418 717 340Q717 263 692.0 198.0Q667 133 620.0 85.5Q573 38 508.5 12.5Q444 -13 367 -13Q290 -13 225.5 12.5Q161 38 114.5 85.5Q68 133 43.0 198.0Q18 263 18 340ZM183 340Q183 280 206.5 236.5Q230 193 272.0 170.0Q314 147 367 147Q422 147 463.0 170.0Q504 193 528.0 237.0Q552 281 552 341Q552 401 528.0 444.0Q504 487 463.0 510.5Q422 534 367 534Q314 534 272.0 510.5Q230 487 206.5 443.5Q183 400 183 340Z" transform="translate(500.86 734.86) scale(1 -1)"/><path d="M51 0V681H303Q377 681 436.0 652.5Q495 624 530.0 569.5Q565 515 565 438Q565 360 530.0 306.0Q495 252 436.0 224.0Q377 196 303 196H176V352H294Q345 352 372.5 374.0Q400 396 400 438Q400 480 372.5 502.0Q345 524 294 524H175L213 559V0ZM395 0 255 275H432L572 0Z" transform="translate(1234.86 734.86) scale(1 -1)"/><path d="M207 0V614H370V0ZM9 524V681H570V524Z" transform="translate(2087.86 734.86) scale(1 -1)"/><path d="M457 0V681H620V0ZM51 0V681H213V0ZM156 255V412H513V255Z" transform="translate(2667.86 734.86) scale(1 -1)"/><path d="M155 264V418H437V264ZM152 527 213 595V80L147 155H491V0H51V681H491V527Z" transform="translate(3338.86 734.86) scale(1 -1)"/><path d="M51 0V681H303Q377 681 436.0 652.5Q495 624 530.0 569.5Q565 515 565 438Q565 360 530.0 306.0Q495 252 436.0 224.0Q377 196 303 196H176V352H294Q345 352 372.5 374.0Q400 396 400 438Q400 480 372.5 502.0Q345 524 294 524H175L213 559V0ZM395 0 255 275H432L572 0Z" transform="translate(4127.86 734.86) scale(1 -1)"/><path d="M155 264V418H437V264ZM152 527 213 595V80L147 155H491V0H51V681H491V527Z" transform="translate(4720.86 734.86) scale(1 -1)"/><path d="M365 -13Q258 -13 180.0 32.0Q102 77 60.0 156.5Q18 236 18 340Q18 418 43.0 482.5Q68 547 114.0 594.5Q160 642 224.0 667.5Q288 693 365 693Q485 693 564.0 639.5Q643 586 681 484L536 425Q507 481 466.0 508.5Q425 536 365 536Q312 536 271.0 512.0Q230 488 206.5 444.0Q183 400 183 340Q183 280 206.5 236.0Q230 192 271.0 168.5Q312 145 365 145Q425 145 466.0 172.0Q507 199 536 255L681 196Q643 94 564.0 40.5Q485 -13 365 -13Z" transform="translate(5249.86 734.86) scale(1 -1)"/><path d="M18 340Q18 418 43.0 482.5Q68 547 114.5 594.5Q161 642 225.5 668.0Q290 694 367 694Q444 694 508.5 668.0Q573 642 620.0 594.5Q667 547 692.0 482.5Q717 418 717 340Q717 263 692.0 198.0Q667 133 620.0 85.5Q573 38 508.5 12.5Q444 -13 367 -13Q290 -13 225.5 12.5Q161 38 114.5 85.5Q68 133 43.0 198.0Q18 263 18 340ZM183 340Q183 280 206.5 236.5Q230 193 272.0 170.0Q314 147 367 147Q422 147 463.0 170.0Q504 193 528.0 237.0Q552 281 552 341Q552 401 528.0 444.0Q504 487 463.0 510.5Q422 534 367 534Q314 534 272.0 510.5Q230 487 206.5 443.5Q183 400 183 340Z" transform="translate(5940.86 734.86) scale(1 -1)"/><path d="M51 0V681H303Q377 681 436.0 652.5Q495 624 530.0 569.5Q565 515 565 438Q565 360 530.0 306.0Q495 252 436.0 224.0Q377 196 303 196H176V352H294Q345 352 372.5 374.0Q400 396 400 438Q400 480 372.5 502.0Q345 524 294 524H175L213 559V0ZM395 0 255 275H432L572 0Z" transform="translate(6674.86 734.86) scale(1 -1)"/><path d="M155 264V418H437V264ZM152 527 213 595V80L147 155H491V0H51V681H491V527Z" transform="translate(4720.86 734.86) scale(1 -1)"/><path d="M51 0V681H294Q402 681 479.0 640.5Q556 600 597.0 524.0Q638 448 638 341Q638 233 596.5 157.0Q555 81 478.0 40.5Q401 0 293 0ZM213 90 146 157H282Q340 157 382.5 175.5Q425 194 448.5 235.0Q472 276 472 341Q472 405 449.0 445.5Q426 486 383.5 505.0Q341 524 283 524H139L213 569Z" transform="translate(7267.86 734.86) scale(1 -1)"/></g><g fill="#F67A1C"><path d="M142 -12Q113 -12 88.0 3.0Q63 18 48.5 43.0Q34 68 34 97Q34 127 48.5 151.5Q63 176 88.0 191.0Q113 206 142 206Q174 206 198.5 191.0Q223 176 237.5 151.5Q252 127 252 97Q252 68 237.5 43.0Q223 18 198.5 3.0Q174 -12 142 -12ZM142 300Q113 300 88.0 315.0Q63 330 48.5 355.0Q34 380 34 409Q34 439 48.5 463.5Q63 488 88.0 503.0Q113 518 142 518Q174 518 198.5 503.0Q223 488 237.5 463.5Q252 439 252 409Q252 380 237.5 355.0Q223 330 198.5 315.0Q174 300 142 300Z" transform="translate(7922.86 734.86) scale(1 -1)"/></g></svg>
+    <div class="footer-claim">Brands built to be remembered.</div>
+    <div class="footer-label">Amazon &amp; Walmart Growth</div>
+  </div>
+</footer>
+
+<script>
+  function toggleMenu(){ document.getElementById('navMobile').classList.toggle('open'); }
+
+  window.addEventListener('scroll',()=>{
+    const d=document.documentElement;
+    const pct=(d.scrollTop/(d.scrollHeight-d.clientHeight));
+    document.getElementById('progress').style.transform='scaleX('+pct+')';
+  });
+
+  const sections=document.querySelectorAll('.section');
+  const sectionObs=new IntersectionObserver((entries)=>{
+    entries.forEach(e=>{if(e.isIntersecting) e.target.classList.add('visible');});
+  },{threshold:0});
+  sections.forEach(s=>sectionObs.observe(s));
+  setTimeout(()=>{ sections.forEach(s=>s.classList.add('visible')); },1500);
+
+  /* ============================================================
+     SUPABASE — shared FTR Amazon Department project
+     ============================================================ */
+  const SUPABASE_URL='https://zbcqdcwibbuyfmytfngn.supabase.co';
+  const SUPABASE_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpiY3FkY3dpYmJ1eWZteXRmbmduIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIyOTgyNTEsImV4cCI6MjA5Nzg3NDI1MX0.gXJna_dG08OVNyQy6VyakhJ7ays93ibLlWCDrS6W1RM';
+  const DOC_PREFIX='everydaypaks-launch-2026';
+
+  const SECTIONS={
+    's01':'Strategy Overview',
+    's02':'Pre-Launch Foundation',
+    's03':'Growth Area 1: Own the Daily Pak Format',
+    's04':'Growth Area 2: Build Trust & Social Proof',
+    's05':'Growth Area 3: Build Search Visibility & a Strong Listing',
+    's06':'Growth Area 4: Use Pricing to Support the Launch',
+    's07':'Growth Area 5: Build the Subscriber Base',
+    's08':'Growth Area 6: Expand Reach Through Creator Connections',
+    's09':'Growth Area 7: Use Video to Educate & Convert',
+    's10':'Growth Area 8: Plan Around Key Amazon Events',
+    's11':'Advertising Strategy',
+    's12':'Creative Strategy',
+    's13':'Roadmap'
+  };
+
+  async function fetchComments(){
+    try{
+      const ids=Object.keys(SECTIONS).map(s=>`${DOC_PREFIX}-${s}`);
+      const r=await fetch(
+        `${SUPABASE_URL}/rest/v1/comments?section_id=in.(${ids.map(s=>`"${s}"`).join(',')})&order=created_at.asc`,
+        {headers:{'apikey':SUPABASE_KEY,'Authorization':`Bearer ${SUPABASE_KEY}`}}
+      );
+      return await r.json();
+    }catch(e){return[];}
+  }
+
+  async function saveComment(sectionId,name,body){
+    const r=await fetch(`${SUPABASE_URL}/rest/v1/comments`,{
+      method:'POST',
+      headers:{
+        'apikey':SUPABASE_KEY,
+        'Authorization':`Bearer ${SUPABASE_KEY}`,
+        'Content-Type':'application/json',
+        'Prefer':'return=representation'
+      },
+      body:JSON.stringify({section_id:`${DOC_PREFIX}-${sectionId}`,name:name||'Anonymous',body})
+    });
+    if(!r.ok) throw new Error('Failed to save');
+    return await fetchComments();
+  }
+
+  function formatDate(iso){
+    const d=new Date(iso);
+    return d.toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'})
+      +' · '+d.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});
+  }
+
+  function escHtml(s){
+    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+
+  function renderSection(id,comments){
+    const container=document.getElementById('comments-'+id);
+    if(!container) return;
+    const fullId=`${DOC_PREFIX}-${id}`;
+    const sectionComments=comments.filter(c=>c.section_id===fullId);
+    const count=sectionComments.length;
+    container.innerHTML=`
+      <button class="section-comment-btn ${count>0?'has-comments':''}" onclick="togglePanel('${id}')">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="flex-shrink:0"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        ${count>0?count+' comment'+(count>1?'s':''):'Add comment'}
+        <span class="cb-count">${count}</span>
+      </button>
+      <div class="comment-panel ${count>0?'open':''}" id="panel-${id}">
+        <div class="comment-panel-inner">
+          <div class="comment-thread" id="thread-${id}">
+            ${count===0?'<p class="no-comments">No comments yet on this section.</p>':
+              sectionComments.map(c=>`
+                <div class="comment-item">
+                  <div class="comment-item-header">
+                    <span class="comment-item-name">${escHtml(c.name||'Anonymous')}</span>
+                    <span class="comment-item-time">${formatDate(c.created_at)}</span>
+                  </div>
+                  <p class="comment-item-text">${escHtml(c.body)}</p>
+                </div>`).join('')}
+          </div>
+          <div class="comment-form">
+            <textarea id="txt-${id}" rows="2" placeholder="Write a comment or question on this section..."></textarea>
+            <div class="comment-form-row">
+              <input type="text" id="name-${id}" placeholder="Your name (optional)">
+              <button class="comment-post-btn" id="btn-${id}" onclick="postComment('${id}')">Post</button>
+            </div>
+            <div class="comment-status" id="status-${id}"></div>
+          </div>
+        </div>
+      </div>`;
+  }
+
+  function togglePanel(id){
+    const panel=document.getElementById('panel-'+id);
+    panel.classList.toggle('open');
+    if(panel.classList.contains('open')){
+      setTimeout(()=>{const t=document.getElementById('txt-'+id);if(t)t.focus();},50);
+    }
+  }
+
+  async function postComment(id){
+    const txt=document.getElementById('txt-'+id);
+    const nameEl=document.getElementById('name-'+id);
+    const btn=document.getElementById('btn-'+id);
+    const status=document.getElementById('status-'+id);
+    const body=txt.value.trim();
+    if(!body){status.textContent='Please write something first.';status.style.color='#e0503a';return;}
+    btn.disabled=true;status.textContent='Posting...';status.style.color='var(--muted)';
+    try{
+      const comments=await saveComment(id,nameEl.value.trim(),body);
+      txt.value='';nameEl.value='';
+      status.textContent='Posted ✓';status.style.color='var(--orange)';
+      setTimeout(()=>{status.textContent='';},3000);
+      Object.keys(SECTIONS).forEach(sid=>renderSection(sid,comments));
+      setTimeout(()=>{const p=document.getElementById('panel-'+id);if(p)p.classList.add('open');},50);
+    }catch(e){
+      status.textContent='Failed to post. Please try again.';status.style.color='#e0503a';
+    }
+    btn.disabled=false;
+  }
+
+  async function initComments(){
+    const comments=await fetchComments();
+    Object.keys(SECTIONS).forEach(id=>renderSection(id,comments));
+    setTimeout(()=>{
+      Object.keys(SECTIONS).forEach(id=>{
+        const panel=document.getElementById('panel-'+id);
+        const hasComments=comments.some(c=>c.section_id===`${DOC_PREFIX}-${id}`);
+        if(panel&&hasComments) panel.classList.add('open');
+      });
+    },200);
+  }
+
+  /* ============================================================
+     TRACKER — event-sourced (append-only) so every team member's
+     edits sync through the same shared Supabase "comments" table,
+     using a distinct key pattern (~) so it never collides with the
+     dash-based section comment keys above.
+
+     Supported ops per event:
+       add    { action, group }   — seeds/creates an item
+       status { status }          — Pending / In Progress / Complete
+       edit   { action }          — rewrites the action's text
+       comment{ text }            — appends a threaded comment
+       delete {}                  — soft-removes the item
+     ============================================================ */
+  const TRACKER_LIKE = `${DOC_PREFIX}~*`;
+
+  async function fetchTrackerEvents(){
+    try{
+      const r = await fetch(`${SUPABASE_URL}/rest/v1/comments?section_id=like.${TRACKER_LIKE}&order=created_at.asc`,
+        { headers:{ apikey:SUPABASE_KEY, Authorization:`Bearer ${SUPABASE_KEY}` } });
+      if(!r.ok) throw new Error('fetch failed');
+      return await r.json();
+    }catch(e){ console.error(e); return null; }
+  }
+
+  async function pushTrackerEvent(phaseKey, itemId, author, payload){
+    const section_id = `${DOC_PREFIX}~${phaseKey}~${itemId}`;
+    const r = await fetch(`${SUPABASE_URL}/rest/v1/comments`, {
+      method:'POST',
+      headers:{ apikey:SUPABASE_KEY, Authorization:`Bearer ${SUPABASE_KEY}`,
+                'Content-Type':'application/json', 'Prefer':'return=representation' },
+      body: JSON.stringify({ section_id, name: author || 'Team', body: JSON.stringify(payload) })
+    });
+    if(!r.ok) throw new Error('save failed');
+    return await r.json();
+  }
+
+  function buildPhaseState(events, phaseKey, seedItems){
+    const items = {};
+    seedItems.forEach(s => { items[s.id] = { id:s.id, action:s.action, group:s.group||null, status:s.status||'Pending', deleted:false, comments:[] }; });
+
+    (events||[]).forEach(ev => {
+      const parts = ev.section_id.split('~');
+      if(parts[1] !== phaseKey) return;
+      const itemId = parts[2];
+      if(RETIRED_SEEDS.has(`${phaseKey}~${itemId}`)) return;
+      let payload; try{ payload = JSON.parse(ev.body); }catch(e){ return; }
+      if(!items[itemId]) items[itemId] = { id:itemId, action:'', group:null, status:'Pending', deleted:false, comments:[] };
+      if(payload.op === 'add'){
+        items[itemId].action = payload.action;
+        items[itemId].group = payload.group || null;
+        items[itemId].status = 'Pending';
+        items[itemId].deleted = false;
+      } else if(payload.op === 'status'){
+        items[itemId].status = payload.status;
+      } else if(payload.op === 'edit'){
+        items[itemId].action = payload.action;
+      } else if(payload.op === 'delete'){
+        items[itemId].deleted = true;
+      } else if(payload.op === 'comment'){
+        items[itemId].comments.push({ name: ev.name, text: payload.text, created_at: ev.created_at });
+      }
+    });
+    return Object.values(items).filter(i => !i.deleted);
+  }
+
+  function statusClass(status){
+    return 'status-' + status.toLowerCase().replace(/\s+/g,'-');
+  }
+
+  /* ============================================================
+     PHASE CONFIG — seeded from the Roadmap in the
+     strategy document. New items / edits added by the team append
+     as event rows, they don't modify this seed list.
+     ============================================================ */
+  const PHASES = [
+    { key:"pre", label:"Pre-Launch", sub:"",
+      seed:[
+        {id:"prei1", action:"Complete Seller Central setup and Brand Registry application."},
+        {id:"prei2", action:"Prepare and complete Amazon supplement compliance requirements."},
+        {id:"prei3", action:"Confirm COGS, inventory availability, and replenishment timelines."},
+        {id:"prei4", action:"Complete FBA setup and prepare inventory for Amazon."},
+        {id:"prei5", action:"Confirm final product, packaging, and launch assets are ready."}
+      ]},
+    { key:"d30", label:"Days 0–30", sub:"",
+      seed:[
+        {id:"d30i1", action:"Complete Amazon keyword and competitive research."},
+        {id:"d30i2", action:"Finalize product positioning and launch messaging."},
+        {id:"d30i3", action:"Create the fully optimized product listing, including SEO, the image stack, Premium A+."},
+        {id:"d30i4", action:"Create Brand Story."},
+        {id:"d30i5", action:"Finalize launch pricing and advertising strategy."},
+        {id:"d30i6", action:"Finalize the product insert."},
+        {id:"d30i7", action:"Send inventory to FBA and confirm availability."},
+        {id:"d30i8", action:"Launch the GLP-1 Support Pak on Amazon."},
+        {id:"d30i9", action:"Begin building sales, reviews, keyword visibility, and conversion history."}
+      ]},
+    { key:"d60", label:"Days 31–60", sub:"",
+      seed:[
+        {id:"d60i1", action:"Activate early review generation."},
+        {id:"d60i2", action:"Review early sales, search, advertising, and conversion performance and optimize accordingly."},
+        {id:"d60i3", action:"Monitor reviews, rating, and customer feedback to identify early opportunities or concerns."},
+        {id:"d60i4", action:"Test the first price increase when trust and conversion support it."},
+        {id:"d60i5", action:"Activate Subscribe & Save once eligible and begin building the subscriber base."},
+        {id:"d60i6", action:"Launch the Amazon Storefront and expand video/product education."},
+        {id:"d60i7", action:"Activate Creator Connections once the listing has established enough social proof."},
+        {id:"d60i8", action:"Prepare for the next relevant Amazon event, including New Year/New You if timing aligns."}
+      ]},
+    { key:"d90", label:"Days 61–90", sub:"",
+      seed:[
+        {id:"d90i1", action:"Scale the strongest advertising, keyword, and conversion opportunities."},
+        {id:"d90i2", action:"Continue pricing tests based on actual performance."},
+        {id:"d90i3", action:"Grow Subscribe & Save and monitor early repeat purchase/subscriber behavior."},
+        {id:"d90i4", action:"Scale Creator Connections and UGC based on performance."},
+        {id:"d90i5", action:"Continue improving the listing using search data, reviews, customer feedback, and conversion learnings."},
+        {id:"d90i6", action:"Review the first 90 days and establish priorities for the next stage of growth."},
+        {id:"d90i7", action:"Begin research into Pak #2 using learnings from the GLP-1 Support launch."}
+      ]},
+  ];
+
+  /* Seed actions retired from the roadmap. Any stored events for these ids
+     are ignored so the outdated actions don't reappear in the tracker. */
+  const RETIRED_SEEDS = new Set([]);
+
+  const STATUS_OPTIONS = ['Pending','In Progress','Complete'];
+  let ALL_TRACKER_EVENTS = [];
+
+  function renderTracker(){
+    const root = document.getElementById('trackerRoot');
+    root.innerHTML = '';
+    let total = 0, complete = 0;
+
+    const phaseStates = PHASES.map(phase => {
+      const items = buildPhaseState(ALL_TRACKER_EVENTS, phase.key, phase.seed);
+      total += items.length;
+      complete += items.filter(i => i.status === 'Complete').length;
+      return { phase, items };
+    });
+
+    const overallPct = total ? Math.round((complete/total)*100) : 0;
+    const progressWrap = document.createElement('div');
+    progressWrap.className = 'tk-progress-wrap';
+    progressWrap.innerHTML = `
+      <div class="tk-progress-stat">${complete}<span>/${total}</span></div>
+      <div class="tk-progress-track"><div class="tk-progress-fill" style="width:${overallPct}%"></div></div>
+      <div class="tk-progress-lbl">${overallPct}% Complete</div>`;
+    root.appendChild(progressWrap);
+
+    phaseStates.forEach(({phase, items}) => {
+      const wrap = document.createElement('div');
+      wrap.className = 'tk-phase';
+      wrap.innerHTML = `
+        <div class="tk-phase-hdr">
+          <div class="tk-phase-rule"></div>
+          <div class="tk-phase-pill"><span class="tk-phase-lbl">${escHtml(phase.label)}</span></div>
+          <div class="tk-phase-rule"></div>
+        </div>
+        <div class="tk-body-mobile" data-phase="${phase.key}"></div>
+        <div class="tk-table-wrap" data-phase="${phase.key}"></div>
+        <button class="tk-add-toggle" data-phase="${phase.key}" data-role="add-toggle">+ Add Action to ${escHtml(phase.label)}</button>
+        <div class="tk-add-form" data-phase="${phase.key}" style="display:none;">
+          <input type="text" placeholder="New action…" data-role="add-input">
+          <button class="tk-add-btn" data-role="add-submit">Add</button>
+        </div>
+      `;
+      root.appendChild(wrap);
+
+      const body = wrap.querySelector('.tk-body-mobile');
+      items.forEach(i => body.appendChild(renderTrackerCard(phase.key, i)));
+
+      const tableWrap = wrap.querySelector('.tk-table-wrap');
+      tableWrap.appendChild(renderTrackerTable(phase.key, items));
+
+      wrap.querySelector('[data-role="add-toggle"]').addEventListener('click', () => {
+        const form = wrap.querySelector('.tk-add-form');
+        form.style.display = form.style.display === 'none' ? 'flex' : 'none';
+        if (form.style.display === 'flex') form.querySelector('input').focus();
+      });
+      wrap.querySelector('[data-role="add-submit"]').addEventListener('click', async () => {
+        const input = wrap.querySelector('[data-role="add-input"]');
+        const val = input.value.trim();
+        if (!val) return;
+        const newId = 'new-' + Date.now() + '-' + Math.random().toString(36).slice(2,7);
+        const btn = wrap.querySelector('[data-role="add-submit"]');
+        btn.disabled = true; btn.textContent = 'Adding…';
+        try{
+          await pushTrackerEvent(phase.key, newId, 'Team', { op:'add', action: val, group:null });
+          input.value = '';
+          wrap.querySelector('.tk-add-form').style.display = 'none';
+          await reloadTracker();
+        }catch(e){
+          alert('Could not add action — check your connection and try again.');
+        }
+        btn.disabled = false; btn.textContent = 'Add';
+      });
+    });
+  }
+
+  /* ---------- shared comment panel markup + wiring ---------- */
+  function commentPanelBodyHTML(domId, item){
+    const commentCount = (item.comments || []).length;
+    const thread = commentCount === 0
+      ? '<p class="tk-no-comments">No comments yet on this action.</p>'
+      : item.comments.map(c => `
+          <div class="tk-comment-item">
+            <div class="tk-comment-item-header">
+              <span class="tk-comment-item-name">${escHtml(c.name||'Anonymous')}</span>
+              <span class="tk-comment-item-time">${formatDate(c.created_at)}</span>
+            </div>
+            <p class="tk-comment-item-text">${escHtml(c.text)}</p>
+          </div>`).join('');
+    return `
+      <div class="tk-comment-thread" id="tk-thread-${domId}">${thread}</div>
+      <div class="tk-comment-form">
+        <textarea id="tk-txt-${domId}" rows="2" placeholder="Add a comment on this action..."></textarea>
+        <div class="tk-comment-form-row">
+          <input type="text" id="tk-name-${domId}" placeholder="Your name (optional)">
+          <button class="tk-comment-post-btn" id="tk-btn-${domId}" data-role="comment-post">Post</button>
+        </div>
+        <div class="tk-comment-status" id="tk-status-msg-${domId}"></div>
+      </div>`;
+  }
+
+  function wireCommentForm(container, phaseKey, item, domId, reopenDomId){
+    container.querySelector('[data-role="comment-post"]').addEventListener('click', async () => {
+      const txt = document.getElementById(`tk-txt-${domId}`);
+      const nameEl = document.getElementById(`tk-name-${domId}`);
+      const btn = document.getElementById(`tk-btn-${domId}`);
+      const status = document.getElementById(`tk-status-msg-${domId}`);
+      const body = txt.value.trim();
+      if(!body){ status.textContent = 'Please write something first.'; status.style.color = '#e0503a'; return; }
+      btn.disabled = true; status.textContent = 'Posting...'; status.style.color = 'var(--muted)';
+      try{
+        await pushTrackerEvent(phaseKey, item.id, nameEl.value.trim() || 'Anonymous', { op:'comment', text: body });
+        await reloadTracker(reopenDomId);
+      }catch(e){
+        status.textContent = 'Failed to post. Please try again.'; status.style.color = '#e0503a';
+        btn.disabled = false;
+      }
+    });
+  }
+
+  /* ---------- shared edit-in-place wiring ---------- */
+  function editWrapHTML(domId, item){
+    return `
+      <div class="tk-edit-wrap" data-role="edit-wrap" id="tk-edit-${domId}">
+        <textarea class="tk-edit-textarea" data-role="edit-textarea">${escHtml(item.action)}</textarea>
+        <div class="tk-edit-actions">
+          <button class="tk-edit-save" data-role="edit-save">Save</button>
+          <button class="tk-edit-cancel" data-role="edit-cancel">Cancel</button>
+        </div>
+      </div>`;
+  }
+
+  function wireEditControls(container, phaseKey, item, domId, actionTextEl, reopenDomId){
+    const editToggle = container.querySelector('[data-role="edit-toggle"]');
+    const editWrap = container.querySelector('[data-role="edit-wrap"]');
+    const textarea = container.querySelector('[data-role="edit-textarea"]');
+    const saveBtn = container.querySelector('[data-role="edit-save"]');
+    const cancelBtn = container.querySelector('[data-role="edit-cancel"]');
+
+    editToggle.addEventListener('click', () => {
+      actionTextEl.classList.add('hidden');
+      editWrap.classList.add('open');
+      textarea.focus();
+      textarea.setSelectionRange(textarea.value.length, textarea.value.length);
+    });
+
+    cancelBtn.addEventListener('click', () => {
+      textarea.value = item.action;
+      editWrap.classList.remove('open');
+      actionTextEl.classList.remove('hidden');
+    });
+
+    saveBtn.addEventListener('click', async () => {
+      const newVal = textarea.value.trim();
+      if(!newVal) return;
+      saveBtn.disabled = true; saveBtn.textContent = 'Saving…';
+      try{
+        await pushTrackerEvent(phaseKey, item.id, 'Team', { op:'edit', action: newVal });
+        await reloadTracker(reopenDomId);
+      }catch(e){
+        alert('Could not save the edit — check your connection and try again.');
+        saveBtn.disabled = false; saveBtn.textContent = 'Save';
+      }
+    });
+  }
+
+  /* ---------- mobile card ---------- */
+  function renderTrackerCard(phaseKey, item){
+    const domId = `m-${phaseKey}-${item.id}`;
+    const commentCount = (item.comments || []).length;
+    const card = document.createElement('div');
+    card.className = 'tk-card';
+    card.innerHTML = `
+      <div class="tk-card-top">
+        <div class="tk-action-wrap">
+          <div class="tk-action" data-role="action-text">${escHtml(item.action)}</div>
+          ${editWrapHTML(domId, item)}
+        </div>
+        <div class="tk-card-controls">
+          <button class="tk-icon-btn" data-role="edit-toggle" title="Edit action">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+          </button>
+          <button class="tk-comment-btn ${commentCount>0?'has-comments':''}" data-role="comment-toggle" title="Comments">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+            Comment
+            ${commentCount>0?`<span class="tk-badge">${commentCount}</span>`:''}
+          </button>
+          <button class="tk-icon-btn" data-role="delete" title="Remove">✕</button>
+        </div>
+      </div>
+      <span class="tk-status-label">Status</span>
+      <select class="tk-status-select ${statusClass(item.status)}" data-role="status"></select>
+      <div class="tk-comment-panel" id="tk-panel-${domId}">${commentPanelBodyHTML(domId, item)}</div>`;
+
+    const actionTextEl = card.querySelector('[data-role="action-text"]');
+    wireEditControls(card, phaseKey, item, domId, actionTextEl, domId);
+
+    const select = card.querySelector('[data-role="status"]');
+    select.innerHTML = STATUS_OPTIONS.map(o => `<option value="${o}" ${o===item.status?'selected':''}>${o}</option>`).join('');
+    select.addEventListener('change', async (e) => {
+      const newStatus = e.target.value;
+      select.className = 'tk-status-select ' + statusClass(newStatus);
+      try{
+        await pushTrackerEvent(phaseKey, item.id, 'Team', { op:'status', status:newStatus });
+      }catch(err){ alert('Could not save status — check your connection.'); }
+      await reloadTracker();
+    });
+
+    card.querySelector('[data-role="delete"]').addEventListener('click', async () => {
+      if (!confirm('Remove this action from the tracker? This cannot be undone.')) return;
+      try{
+        await pushTrackerEvent(phaseKey, item.id, 'Team', { op:'delete' });
+        await reloadTracker();
+      }catch(e){ alert('Could not remove action — check your connection.'); }
+    });
+
+    card.querySelector('[data-role="comment-toggle"]').addEventListener('click', () => {
+      const panel = card.querySelector(`#tk-panel-${domId}`);
+      panel.classList.toggle('open');
+      if (panel.classList.contains('open')) {
+        setTimeout(() => { const t = document.getElementById(`tk-txt-${domId}`); if(t) t.focus(); }, 50);
+      }
+    });
+
+    wireCommentForm(card, phaseKey, item, domId, domId);
+    return card;
+  }
+
+  /* ---------- desktop table ---------- */
+  function renderTrackerTable(phaseKey, items){
+    const table = document.createElement('table');
+    table.className = 'tk-table';
+    table.innerHTML = `
+      <thead>
+        <tr>
+          <th>Action</th>
+          <th class="tk-th-center">Status</th>
+          <th class="tk-th-center">Edit</th>
+          <th class="tk-th-center">Comments</th>
+          <th class="tk-th-center"></th>
+        </tr>
+      </thead>
+      <tbody></tbody>`;
+    const tbody = table.querySelector('tbody');
+
+    items.forEach(item => {
+      const domId = `t-${phaseKey}-${item.id}`;
+      const commentCount = (item.comments || []).length;
+
+      const row = document.createElement('tr');
+      row.className = 'tk-row';
+      row.innerHTML = `
+        <td class="tk-td-action">
+          <div class="tk-action" data-role="action-text">${escHtml(item.action)}</div>
+          ${editWrapHTML(domId, item)}
+        </td>
+        <td class="tk-td-status"><select class="tk-status-select ${statusClass(item.status)}" data-role="status"></select></td>
+        <td class="tk-td-edit"><button class="tk-icon-btn" data-role="edit-toggle" title="Edit action">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+        </button></td>
+        <td class="tk-td-comments">
+          <button class="tk-icon-btn ${commentCount>0?'has-comments':''}" data-role="comment-toggle" title="Comments">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+            ${commentCount>0?`<span class="tk-badge">${commentCount}</span>`:''}
+          </button>
+        </td>
+        <td class="tk-td-delete"><button class="tk-icon-btn" data-role="delete" title="Remove">✕</button></td>`;
+
+      const commentRow = document.createElement('tr');
+      commentRow.className = 'tk-comment-row';
+      commentRow.id = `tk-panel-${domId}`;
+      commentRow.innerHTML = `<td colspan="5"><div class="tk-comment-row-inner">${commentPanelBodyHTML(domId, item)}</div></td>`;
+
+      const actionTextEl = row.querySelector('[data-role="action-text"]');
+      wireEditControls(row, phaseKey, item, domId, actionTextEl, domId);
+
+      const select = row.querySelector('[data-role="status"]');
+      select.innerHTML = STATUS_OPTIONS.map(o => `<option value="${o}" ${o===item.status?'selected':''}>${o}</option>`).join('');
+      select.addEventListener('change', async (e) => {
+        const newStatus = e.target.value;
+        select.className = 'tk-status-select ' + statusClass(newStatus);
+        try{
+          await pushTrackerEvent(phaseKey, item.id, 'Team', { op:'status', status:newStatus });
+        }catch(err){ alert('Could not save status — check your connection.'); }
+        await reloadTracker();
+      });
+
+      row.querySelector('[data-role="delete"]').addEventListener('click', async () => {
+        if (!confirm('Remove this action from the tracker? This cannot be undone.')) return;
+        try{
+          await pushTrackerEvent(phaseKey, item.id, 'Team', { op:'delete' });
+          await reloadTracker();
+        }catch(e){ alert('Could not remove action — check your connection.'); }
+      });
+
+      row.querySelector('[data-role="comment-toggle"]').addEventListener('click', () => {
+        commentRow.classList.toggle('open');
+        if (commentRow.classList.contains('open')) {
+          setTimeout(() => { const t = document.getElementById(`tk-txt-${domId}`); if(t) t.focus(); }, 50);
+        }
+      });
+
+      wireCommentForm(commentRow, phaseKey, item, domId, domId);
+
+      tbody.appendChild(row);
+      tbody.appendChild(commentRow);
+    });
+
+    return table;
+  }
+
+  async function reloadTracker(reopenDomId){
+    const events = await fetchTrackerEvents();
+    if (events !== null) ALL_TRACKER_EVENTS = events;
+    renderTracker();
+    if (reopenDomId){
+      const panel = document.getElementById('tk-panel-' + reopenDomId);
+      if (panel) panel.classList.add('open');
+    }
+  }
+
+
+  /* ============================================================
+     ANNUAL AMAZON EVENT PLAN — rebuilt from the strategy's timeline
+     graphic. Positions are fractions of the year (0 = Jan 1, 12 = Dec 31).
+     ============================================================ */
+  (function buildEventTimeline(){
+    const area = document.getElementById('evArea');
+    if(!area) return;
+    const MONTHS = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
+    const EVENTS = [
+      { label:'New Year New You',          at:0.52,  side:'up',   h:70  },
+      { label:'Big Spring Sale',           at:2.71,  side:'up',   h:70  },
+      { label:'Prime Day FBA Cut Off',     at:4.62,  side:'down' },
+      { label:'Prime Day',                 at:5.61,  side:'up',   h:70  },
+      { label:'Fall Prime Day FBA Cut Off',at:8.50,  side:'down' },
+      { label:'Fall Prime Day',            at:9.29,  side:'up',   h:132 },
+      { label:'BFCM FBA Cut Off',          at:9.78,  side:'down', low:true },
+      { label:'BFCM',                      at:10.52, side:'up',   h:84  },
+    ];
+    let html = '<div class="ev-line"></div>';
+    for(let i=0;i<=12;i++) html += `<div class="ev-node" style="left:${(i/12*100).toFixed(3)}%"></div>`;
+    MONTHS.forEach((m,i)=>{ html += `<div class="ev-month" style="left:${((i+0.5)/12*100).toFixed(3)}%">${m}</div>`; });
+    EVENTS.forEach(e=>{
+      const left = (e.at/12*100).toFixed(3);
+      if(e.side==='up'){
+        html += `<div class="ev ev-up" style="left:${left}%"><div class="ev-label">${escHtml(e.label)}</div><div class="ev-dot"></div><div class="ev-stem" style="height:${e.h}px"></div></div>`;
+      } else {
+        html += `<div class="ev ev-down" style="left:${left}%"><div class="ev-stem" style="height:${e.low?96:58}px"></div><div class="ev-dot"></div><div class="ev-label">${escHtml(e.label)}</div></div>`;
+      }
+    });
+    area.innerHTML = html;
+  })();
+
+  initComments();
+  reloadTracker();
+</script>
+</body>
+</html>
