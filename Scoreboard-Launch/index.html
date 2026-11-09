@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>EverydayPaks · Performance Scoreboard</title>
+<link rel="icon" href="favicon.ico">
+<link href="https://fonts.googleapis.com/css2?family=Gabarito:wght@400..900&family=Figtree:ital,wght@0,400;0,500;0,600;0,700;1,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy:#0F1B2A; --navy2:#1B2D45; --paper:#F5F3EE; --sand:#EDEAE1; --white:#FFFFFF;
+    --ink:#16191E; --bone:#F2F4F6; --muted:#57606C; --dim:#9AA3AE; --line:#D6D1C2;
+    --orange:#F67A1C; --soft:#FDEEDF; --blue:#1273C8; --pale:#E8F1FA; --lime:#C6F432;
+    --green:#3FAE6A; --green-ink:#1F7A45; --green-bg:#E6F4EC;
+    --amber:#D9A62E; --amber-ink:#8A6410; --amber-bg:#FBF2DC;
+    --red:#E5484D; --red-ink:#B4262B; --red-bg:#FCE8E8;
+    --display:Gabarito,"Arial Black",sans-serif;
+    --body:Figtree,Arial,sans-serif;
+    --mono:"IBM Plex Mono",ui-monospace,monospace;
+  }
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+  html{scroll-behavior:smooth;}
+  body{font-family:var(--body);font-size:16px;line-height:1.55;background:var(--paper);color:var(--ink);overflow-x:hidden;}
+  button,input,select,textarea{font-family:inherit;}
+
+  /* NAV */
+  nav{position:sticky;top:0;z-index:50;background:var(--navy);border-bottom:1px solid rgba(242,244,246,.12);height:56px;padding:0 2rem;display:flex;align-items:center;justify-content:space-between;}
+  .nav-brand{font-family:var(--display);font-weight:800;font-size:1.1rem;color:var(--bone);white-space:nowrap;}
+  .nav-brand span{color:var(--orange);}
+  .nav-links{display:flex;}
+  .nav-links a{padding:0 .7rem;line-height:56px;font-family:var(--mono);font-size:.68rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--dim);text-decoration:none;white-space:nowrap;}
+  .nav-links a:hover{color:var(--bone);}
+
+  .wrap{max-width:1180px;margin:0 auto;padding:0 2rem;}
+
+  /* HERO */
+  .hero{background:var(--navy);color:var(--bone);padding:3.5rem 0 3rem;}
+  .ftr-mark{width:200px;height:auto;display:block;margin-bottom:2.25rem;}
+  .badge{display:inline-flex;align-items:center;gap:10px;border:1px solid rgba(242,244,246,.16);background:var(--navy2);border-radius:999px;padding:7px 16px;font-family:var(--mono);font-size:.7rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--bone);margin-bottom:1.5rem;}
+  .badge-dot{width:8px;height:8px;border-radius:50%;background:var(--blue);flex-shrink:0;}
+  .hero h1{font-family:var(--display);font-weight:900;text-transform:uppercase;line-height:.92;letter-spacing:-.045em;}
+  .hero h1 .l1{display:block;font-size:clamp(44px,7vw,104px);color:var(--bone);}
+  .hero h1 .l2{display:block;font-size:clamp(26px,3.8vw,56px);color:var(--lime);margin-top:.35rem;}
+  .hero-sub{margin-top:1.25rem;max-width:62ch;color:var(--dim);font-size:1.02rem;}
+  .stat-bar{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:.85rem;margin-top:2.25rem;}
+  .stat{background:var(--navy2);border:1px solid rgba(242,244,246,.12);border-radius:16px;padding:1rem 1.1rem;}
+  .stat-lbl{display:block;font-family:var(--mono);font-size:.66rem;font-weight:600;letter-spacing:.13em;text-transform:uppercase;color:var(--dim);margin-bottom:.4rem;}
+  .stat-val{font-family:var(--display);font-weight:800;font-size:1.3rem;line-height:1.2;color:var(--bone);}
+  .stat-val small{display:block;font-family:var(--body);font-weight:400;font-size:.8rem;color:var(--dim);margin-top:.15rem;}
+
+  /* BANNER */
+  .db-banner{display:none;margin:1.5rem 0 0;background:var(--soft);border:1px solid #F3C9A3;border-radius:12px;padding:.85rem 1.1rem;font-size:.92rem;color:var(--ink);}
+  .db-banner.show{display:block;}
+
+  /* SECTIONS */
+  .section{padding:3rem 0 .5rem;scroll-margin-top:64px;}
+  .sec-head{background:var(--white);border:1px solid var(--line);border-radius:20px;padding:1.15rem 1.5rem;margin-bottom:1.1rem;}
+  .sec-eyebrow{font-family:var(--mono);font-size:.68rem;font-weight:600;letter-spacing:.13em;text-transform:uppercase;color:var(--muted);}
+  .sec-title{font-family:var(--display);font-weight:800;font-size:1.65rem;line-height:1.2;color:var(--ink);margin-top:.2rem;}
+  .sec-answers{font-family:var(--mono);font-size:.74rem;font-weight:600;letter-spacing:.06em;color:var(--blue);margin-top:.45rem;}
+  .section.primary .sec-head{border-left:5px solid var(--orange);padding:1.4rem 1.6rem;}
+  .section.primary .sec-title{font-size:2.15rem;}
+
+  .m-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1rem;align-items:start;}
+  .m-grid.single{grid-template-columns:1fr;}
+
+  /* METRIC CARD */
+  .m-card{background:var(--white);border:1px solid var(--line);border-radius:20px;padding:1.3rem 1.35rem 1.35rem;min-width:0;}
+  .section.primary .m-card{border-top:3px solid var(--orange);}
+  .m-head{display:flex;justify-content:space-between;align-items:flex-start;gap:1rem;margin-bottom:1rem;}
+  .m-title-wrap{min-width:0;}
+  .m-name{font-family:var(--display);font-weight:700;font-size:1.2rem;line-height:1.25;color:var(--ink);display:flex;align-items:center;gap:.55rem;flex-wrap:wrap;}
+  .m-freq{font-family:var(--mono);font-size:.6rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);background:var(--sand);border-radius:12px;padding:.2rem .55rem;}
+  .m-note{font-size:.86rem;font-style:italic;color:var(--muted);margin-top:.3rem;line-height:1.45;}
+  .m-controls{display:flex;gap:.45rem;flex-shrink:0;}
+
+  .tk-icon-btn{position:relative;width:36px;height:36px;border:1px solid var(--line);border-radius:8px;background:var(--white);color:var(--muted);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .15s;}
+  .tk-icon-btn:hover{border-color:var(--orange);color:var(--orange);}
+  .tk-icon-btn.has-comments{color:var(--ink);}
+  .tk-badge{position:absolute;top:-7px;right:-7px;background:var(--orange);color:var(--navy);font-size:.62rem;font-weight:700;border-radius:8px;min-width:17px;height:17px;padding:0 4px;display:flex;align-items:center;justify-content:center;line-height:1;}
+
+  select.tk-status-select{width:100%;display:block;margin-bottom:1.1rem;text-align:center;text-align-last:center;padding:.65rem 1rem;border-radius:999px;border:1.5px solid transparent;font-family:var(--display);font-weight:700;font-size:.9rem;cursor:pointer;appearance:none;-webkit-appearance:none;}
+  .st-none{background:var(--sand);color:var(--muted);border-color:var(--line)!important;}
+  .st-good{background:var(--green-bg);color:var(--green-ink);border-color:var(--green)!important;}
+  .st-mid{background:var(--amber-bg);color:var(--amber-ink);border-color:var(--amber)!important;}
+  .st-bad{background:var(--red-bg);color:var(--red-ink);border-color:var(--red)!important;}
+  .hero select.tk-status-select{margin:0;padding:.5rem .8rem;font-size:.95rem;}
+
+  /* summary */
+  .m-summary{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.6rem;}
+  .sum-cell{background:var(--paper);border-radius:12px;padding:.7rem .8rem;min-width:0;}
+  .sum-lbl{display:block;font-family:var(--mono);font-size:.6rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);}
+  .sum-val{display:block;font-family:var(--display);font-weight:800;font-size:1.45rem;line-height:1.2;color:var(--ink);margin-top:.2rem;overflow-wrap:anywhere;}
+  .sum-val.empty{font-family:var(--body);font-weight:400;font-style:italic;font-size:.88rem;color:var(--muted);margin-top:.35rem;}
+  .sum-sub{display:block;font-size:.74rem;color:var(--muted);margin-top:.1rem;}
+  .sum-delta{margin-top:.45rem;line-height:1.4;}
+  .sum-cell .delta{font-size:.82rem;}
+
+  .delta{display:inline-flex;align-items:center;gap:.25rem;font-family:var(--mono);font-size:.68rem;font-weight:600;letter-spacing:.03em;border-radius:6px;padding:.15rem .45rem;white-space:nowrap;}
+  .delta.up{background:var(--green-bg);color:var(--green-ink);}
+  .delta.down{background:var(--red-bg);color:var(--red-ink);}
+  .delta.flat{background:var(--amber-bg);color:var(--amber-ink);}
+  .delta.neutral{background:var(--sand);color:var(--muted);}
+
+  /* sparkline */
+  .spark{position:relative;height:64px;margin-top:1rem;border-bottom:1px solid var(--line);}
+  .spark svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible;}
+  .spark-dot{position:absolute;width:10px;height:10px;border-radius:50%;background:var(--orange);border:2px solid var(--white);transform:translate(-50%,-50%);}
+  .spark-pt{position:absolute;width:6px;height:6px;border-radius:50%;background:var(--navy);transform:translate(-50%,-50%);}
+  .spark-axis{display:flex;justify-content:space-between;font-family:var(--mono);font-size:.6rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-top:.35rem;}
+  .spark-empty{margin-top:1rem;font-size:.82rem;font-style:italic;color:var(--muted);background:var(--paper);border-radius:10px;padding:.6rem .8rem;}
+
+  /* history */
+  .hist-toggle{margin-top:.9rem;background:none;border:none;cursor:pointer;font-family:var(--mono);font-size:.68rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);padding:.2rem 0;}
+  .hist-toggle:hover{color:var(--orange);}
+  .hist{display:none;margin-top:.7rem;}
+  .hist.open{display:block;}
+  .p-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(112px,1fr));gap:.5rem;}
+  .p-cell{background:var(--paper);border:1px solid transparent;border-radius:10px;padding:.55rem .65rem;min-width:0;}
+  .p-cell.now{border-color:var(--orange);}
+  .p-lbl{display:block;font-family:var(--mono);font-size:.62rem;font-weight:600;letter-spacing:.11em;text-transform:uppercase;color:var(--ink);}
+  .p-date{display:block;font-size:.7rem;color:var(--muted);}
+  .p-val{display:block;font-weight:600;font-size:.98rem;color:var(--ink);margin:.25rem 0 .2rem;overflow-wrap:anywhere;}
+  .p-val.empty{font-weight:400;font-style:italic;font-size:.8rem;color:var(--muted);}
+
+  /* edit */
+  .tk-edit-wrap{display:none;}
+  .tk-edit-wrap.open{display:block;}
+  .view.hidden{display:none;}
+  .p-input{width:100%;padding:.45rem .55rem;border:1.5px solid var(--line);border-radius:8px;font-size:.92rem;background:var(--white);color:var(--ink);margin-top:.3rem;outline:none;}
+  .p-input:focus{border-color:var(--orange);}
+  .edit-hint{font-size:.8rem;color:var(--muted);margin-bottom:.6rem;}
+  .tk-edit-actions{display:flex;gap:.5rem;margin-top:.85rem;}
+  .tk-edit-save{background:var(--orange);color:var(--navy);border:none;border-radius:999px;padding:.55rem 1.25rem;font-weight:700;font-size:.85rem;cursor:pointer;min-height:40px;}
+  .tk-edit-save:hover{background:var(--ink);color:var(--white);}
+  .tk-edit-save:disabled{opacity:.5;cursor:default;}
+  .tk-edit-cancel{background:transparent;color:var(--muted);border:1.5px solid var(--line);border-radius:999px;padding:.55rem 1.25rem;font-weight:600;font-size:.85rem;cursor:pointer;min-height:40px;}
+  .tk-edit-cancel:hover{border-color:var(--ink);color:var(--ink);}
+
+  /* milestone */
+  .ms-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.6rem;}
+  .ms-grid select.tk-status-select{margin:0;margin-top:.35rem;}
+  .ms-date{width:100%;margin-top:.35rem;padding:.55rem .7rem;border:1.5px solid var(--line);border-radius:8px;background:var(--white);font-size:.95rem;color:var(--ink);}
+
+  /* comments */
+  .tk-comment-panel{display:none;margin-top:1.1rem;padding-top:1rem;border-top:1px solid var(--line);}
+  .tk-comment-panel.open{display:block;}
+  .tk-comment-thread{display:flex;flex-direction:column;gap:.55rem;margin-bottom:.75rem;}
+  .tk-comment-item{border-left:3px solid var(--orange);border-radius:0 8px 8px 0;background:var(--paper);padding:.6rem .85rem;}
+  .tk-comment-item-header{display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:.25rem;margin-bottom:.2rem;}
+  .tk-comment-item-name{font-family:var(--display);font-weight:700;font-size:.9rem;}
+  .tk-comment-item-time{font-size:.72rem;color:var(--muted);}
+  .tk-comment-item-text{font-size:.9rem;line-height:1.5;white-space:pre-wrap;}
+  .tk-no-comments{font-size:.85rem;font-style:italic;color:var(--muted);margin-bottom:.7rem;}
+  .tk-comment-form textarea{width:100%;min-height:56px;padding:.55rem .7rem;border:1.5px solid var(--line);border-radius:8px;font-size:.9rem;resize:vertical;outline:none;background:var(--white);color:var(--ink);display:block;margin-bottom:.5rem;}
+  .tk-comment-form textarea:focus,.tk-comment-form input:focus{border-color:var(--orange);}
+  .tk-comment-form-row{display:flex;gap:.5rem;flex-wrap:wrap;}
+  .tk-comment-form input{flex:1;min-width:140px;padding:.5rem .65rem;border:1.5px solid var(--line);border-radius:8px;font-size:.9rem;outline:none;background:var(--white);color:var(--ink);}
+  .tk-comment-post-btn{background:var(--orange);color:var(--navy);border:none;border-radius:999px;padding:.5rem 1.2rem;font-weight:700;font-size:.85rem;cursor:pointer;min-height:40px;}
+  .tk-comment-post-btn:hover{background:var(--ink);color:var(--white);}
+  .tk-comment-post-btn:disabled{opacity:.5;cursor:default;}
+  .tk-comment-status{font-size:.78rem;color:var(--muted);margin-top:.3rem;}
+
+  /* FOOTER */
+  footer{background:var(--navy);color:var(--bone);margin-top:4rem;padding:3.5rem 2rem;text-align:center;}
+  footer .ftr-mark{margin:0 auto 1rem;}
+  .footer-claim{font-family:var(--display);font-weight:800;font-size:clamp(1.3rem,3vw,1.9rem);color:var(--bone);margin-bottom:.4rem;}
+  .footer-label{font-family:var(--mono);font-size:.7rem;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--dim);}
+
+  @media(max-width:860px){
+    nav{padding:0 1.1rem;}
+    .nav-links{display:none;}
+    .wrap{padding:0 1.1rem;}
+    .stat-bar{grid-template-columns:repeat(2,minmax(0,1fr));}
+    .m-grid{grid-template-columns:1fr;}
+    .p-grid{grid-template-columns:1fr;}
+    .ms-grid{grid-template-columns:1fr;}
+    .sec-title{font-size:1.35rem;}
+    .section.primary .sec-title{font-size:1.65rem;}
+  }
+  @media(max-width:420px){
+    .stat-bar{grid-template-columns:1fr;}
+    .sum-val{font-size:1.15rem;}
+    .sum-cell{padding:.6rem .6rem;}
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-brand">EverydayPaks<span>:</span> Scoreboard</div>
+  <div class="nav-links" id="navLinks"></div>
+</nav>
+
+<header class="hero">
+  <div class="wrap">
+    <svg class="ftr-mark" viewBox="0 0 8215.72 788.72" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="For The Record"><g fill="#F2F4F6"><path d="M162 244V401H441V244ZM213 0H51V681H489V524H152L213 595Z" transform="translate(-10.14 734.86) scale(1 -1)"/><path d="M18 340Q18 418 43.0 482.5Q68 547 114.5 594.5Q161 642 225.5 668.0Q290 694 367 694Q444 694 508.5 668.0Q573 642 620.0 594.5Q667 547 692.0 482.5Q717 418 717 340Q717 263 692.0 198.0Q667 133 620.0 85.5Q573 38 508.5 12.5Q444 -13 367 -13Q290 -13 225.5 12.5Q161 38 114.5 85.5Q68 133 43.0 198.0Q18 263 18 340ZM183 340Q183 280 206.5 236.5Q230 193 272.0 170.0Q314 147 367 147Q422 147 463.0 170.0Q504 193 528.0 237.0Q552 281 552 341Q552 401 528.0 444.0Q504 487 463.0 510.5Q422 534 367 534Q314 534 272.0 510.5Q230 487 206.5 443.5Q183 400 183 340Z" transform="translate(500.86 734.86) scale(1 -1)"/><path d="M51 0V681H303Q377 681 436.0 652.5Q495 624 530.0 569.5Q565 515 565 438Q565 360 530.0 306.0Q495 252 436.0 224.0Q377 196 303 196H176V352H294Q345 352 372.5 374.0Q400 396 400 438Q400 480 372.5 502.0Q345 524 294 524H175L213 559V0ZM395 0 255 275H432L572 0Z" transform="translate(1234.86 734.86) scale(1 -1)"/><path d="M207 0V614H370V0ZM9 524V681H570V524Z" transform="translate(2087.86 734.86) scale(1 -1)"/><path d="M457 0V681H620V0ZM51 0V681H213V0ZM156 255V412H513V255Z" transform="translate(2667.86 734.86) scale(1 -1)"/><path d="M155 264V418H437V264ZM152 527 213 595V80L147 155H491V0H51V681H491V527Z" transform="translate(3338.86 734.86) scale(1 -1)"/><path d="M51 0V681H303Q377 681 436.0 652.5Q495 624 530.0 569.5Q565 515 565 438Q565 360 530.0 306.0Q495 252 436.0 224.0Q377 196 303 196H176V352H294Q345 352 372.5 374.0Q400 396 400 438Q400 480 372.5 502.0Q345 524 294 524H175L213 559V0ZM395 0 255 275H432L572 0Z" transform="translate(4127.86 734.86) scale(1 -1)"/><path d="M155 264V418H437V264ZM152 527 213 595V80L147 155H491V0H51V681H491V527Z" transform="translate(4720.86 734.86) scale(1 -1)"/><path d="M365 -13Q258 -13 180.0 32.0Q102 77 60.0 156.5Q18 236 18 340Q18 418 43.0 482.5Q68 547 114.0 594.5Q160 642 224.0 667.5Q288 693 365 693Q485 693 564.0 639.5Q643 586 681 484L536 425Q507 481 466.0 508.5Q425 536 365 536Q312 536 271.0 512.0Q230 488 206.5 444.0Q183 400 183 340Q183 280 206.5 236.0Q230 192 271.0 168.5Q312 145 365 145Q425 145 466.0 172.0Q507 199 536 255L681 196Q643 94 564.0 40.5Q485 -13 365 -13Z" transform="translate(5249.86 734.86) scale(1 -1)"/><path d="M18 340Q18 418 43.0 482.5Q68 547 114.5 594.5Q161 642 225.5 668.0Q290 694 367 694Q444 694 508.5 668.0Q573 642 620.0 594.5Q667 547 692.0 482.5Q717 418 717 340Q717 263 692.0 198.0Q667 133 620.0 85.5Q573 38 508.5 12.5Q444 -13 367 -13Q290 -13 225.5 12.5Q161 38 114.5 85.5Q68 133 43.0 198.0Q18 263 18 340ZM183 340Q183 280 206.5 236.5Q230 193 272.0 170.0Q314 147 367 147Q422 147 463.0 170.0Q504 193 528.0 237.0Q552 281 552 341Q552 401 528.0 444.0Q504 487 463.0 510.5Q422 534 367 534Q314 534 272.0 510.5Q230 487 206.5 443.5Q183 400 183 340Z" transform="translate(5940.86 734.86) scale(1 -1)"/><path d="M51 0V681H303Q377 681 436.0 652.5Q495 624 530.0 569.5Q565 515 565 438Q565 360 530.0 306.0Q495 252 436.0 224.0Q377 196 303 196H176V352H294Q345 352 372.5 374.0Q400 396 400 438Q400 480 372.5 502.0Q345 524 294 524H175L213 559V0ZM395 0 255 275H432L572 0Z" transform="translate(6674.86 734.86) scale(1 -1)"/><path d="M51 0V681H294Q402 681 479.0 640.5Q556 600 597.0 524.0Q638 448 638 341Q638 233 596.5 157.0Q555 81 478.0 40.5Q401 0 293 0ZM213 90 146 157H282Q340 157 382.5 175.5Q425 194 448.5 235.0Q472 276 472 341Q472 405 449.0 445.5Q426 486 383.5 505.0Q341 524 283 524H139L213 569Z" transform="translate(7267.86 734.86) scale(1 -1)"/></g><g fill="#F67A1C"><path d="M142 -12Q113 -12 88.0 3.0Q63 18 48.5 43.0Q34 68 34 97Q34 127 48.5 151.5Q63 176 88.0 191.0Q113 206 142 206Q174 206 198.5 191.0Q223 176 237.5 151.5Q252 127 252 97Q252 68 237.5 43.0Q223 18 198.5 3.0Q174 -12 142 -12ZM142 300Q113 300 88.0 315.0Q63 330 48.5 355.0Q34 380 34 409Q34 439 48.5 463.5Q63 488 88.0 503.0Q113 518 142 518Q174 518 198.5 503.0Q223 488 237.5 463.5Q252 439 252 409Q252 380 237.5 355.0Q223 330 198.5 315.0Q174 300 142 300Z" transform="translate(7922.86 734.86) scale(1 -1)"/></g></svg>
+
+    <div class="badge"><span class="badge-dot"></span>GLP-1 Support Pak · Amazon Launch</div>
+    <h1><span class="l1">EverydayPaks</span><span class="l2">Performance Scoreboard</span></h1>
+    <p class="hero-sub">Tracking the first 90 days from go-live, reviewed weekly and monthly. Baselines first. Targets are added once the data supports them.</p>
+
+    <div class="stat-bar">
+      <div class="stat"><span class="stat-lbl">Last Updated</span><div class="stat-val" id="statUpdated">No entries yet</div></div>
+      <div class="stat"><span class="stat-lbl">Go-Live</span><div class="stat-val" id="statGolive">Not yet live</div></div>
+      <div class="stat"><span class="stat-lbl">Launch Window</span><div class="stat-val" id="statWindow">Pre-launch</div></div>
+      <div class="stat"><span class="stat-lbl">Overall Status</span><select class="tk-status-select" id="overallStatus"></select></div>
+    </div>
+    <div class="db-banner" id="dbBanner">Not connected to the shared database. Values, statuses and comments can't be loaded or saved right now. Check your connection and refresh the page.</div>
+  </div>
+</header>
+
+<main class="wrap" id="root"></main>
+
+<footer>
+  <svg class="ftr-mark" viewBox="0 0 8215.72 788.72" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="For The Record"><use href="#"/></svg>
+  <div class="footer-claim">Brands built to be remembered.</div>
+  <div class="footer-label">Amazon growth for established DTC &amp; CPG brands</div>
+</footer>
+
+<script>
+  /* ============================================================
+     SUPABASE: shared FTR project (same as the EverydayPaks
+     strategy site). DOC_PREFIX keeps scoreboard events separate
+     from the strategy site's comments/roadmap rows.
+     ============================================================ */
+  const SUPABASE_URL='https://zbcqdcwibbuyfmytfngn.supabase.co';
+  const SUPABASE_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpiY3FkY3dpYmJ1eWZteXRmbmduIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIyOTgyNTEsImV4cCI6MjA5Nzg3NDI1MX0.gXJna_dG08OVNyQy6VyakhJ7ays93ibLlWCDrS6W1RM';
+  const DOC_PREFIX='everydaypaks-scoreboard-2026';
+
+  /* ============================================================
+     PERIODS: counted from go-live. 13 weeks / 3 months = 90 days.
+     ============================================================ */
+  const PERIODS={
+    weekly: Array.from({length:13},(_,i)=>({key:'w'+(i+1),label:'Week '+(i+1),short:'W'+(i+1),idx:i})),
+    monthly:[
+      {key:'m1',label:'Month 1',short:'M1',idx:0,days:'Days 0–30'},
+      {key:'m2',label:'Month 2',short:'M2',idx:1,days:'Days 31–60'},
+      {key:'m3',label:'Month 3',short:'M3',idx:2,days:'Days 61–90'}
+    ]
+  };
+
+  /* ============================================================
+     METRICS: fixed to the KPI list agreed for this strategy.
+     dir: up = higher is better, down = lower is better,
+          context = judge alongside other metrics (no auto colour).
+     ============================================================ */
+  const SECTIONS=[
+    {key:'launch',eyebrow:'Launch Readiness',title:'Launch readiness',
+      answers:['Is the GLP-1 Support Pak live on Amazon?'],
+      metrics:[{id:'listing-launched',type:'milestone',name:'Listing Launched',freq:'One-time milestone'}]},
+    {key:'growth',eyebrow:'Growth',title:'Growth',primary:true,
+      answers:['Is the launch building sales momentum?','Is volume growing as the brand builds trust?'],
+      metrics:[
+        {id:'total-sales',name:'Total Sales',freq:'weekly',dir:'up',unit:'$',note:'Read with Units Sold so price tests don\u2019t mask volume changes.'},
+        {id:'units-sold',name:'Units Sold',freq:'weekly',dir:'up',unit:'num',note:'Primary volume signal while price moves up the ladder from $19.99 toward $24.99.'}
+      ]},
+    {key:'visibility',eyebrow:'Visibility',title:'Visibility',
+      answers:['Are more shoppers reaching the listing?'],
+      metrics:[{id:'sessions',name:'Sessions',freq:'weekly',dir:'up',unit:'num',note:'Read with Conversion Rate: traffic only counts if it converts.'}]},
+    {key:'conversion',eyebrow:'Conversion',title:'Conversion',
+      answers:['Is the listing turning traffic into orders?'],
+      metrics:[{id:'conversion-rate',name:'Conversion Rate',freq:'weekly',dir:'up',unit:'%',note:'Unit Session Percentage. Note the current price stage when reviewing changes.'}]},
+    {key:'search',eyebrow:'Search',title:'Search',
+      answers:['Are we getting found for GLP-1 support searches?','Are we winning a growing share of clicks?'],
+      metrics:[
+        {id:'organic-rank',name:'Organic Keyword Rankings',freq:'weekly',dir:'down',unit:'rank',note:'Average organic position across the core \u201cglp-1 support\u201d keyword set. Lower is better.'},
+        {id:'click-share',name:'Search Query Click Share',freq:'monthly',dir:'up',unit:'%',note:'Brand Analytics Search Query Performance, core GLP-1 support queries.'}
+      ]},
+    {key:'advertising',eyebrow:'Advertising',title:'Advertising',
+      answers:['Is capped launch spend building sales efficiently?'],
+      metrics:[
+        {id:'ad-spend',name:'Ad Spend',freq:'weekly',dir:'context',unit:'$',note:'Launch spend is capped. Judge alongside TACoS and Total Sales, not on its own.'},
+        {id:'tacos',name:'TACoS',freq:'weekly',dir:'down',unit:'%',note:'Expect it to run high at launch. Lower is better as organic sales build.'}
+      ]},
+    {key:'trust',eyebrow:'Trust',title:'Trust',
+      answers:['Are we building the social proof a new brand needs?'],
+      metrics:[
+        {id:'review-count',name:'Review Count',freq:'weekly',dir:'up',unit:'num',note:'Cumulative total on the listing.'},
+        {id:'avg-rating',name:'Average Rating',freq:'weekly',dir:'up',unit:'rating',note:'Day 30 review: the strategy scales ad spend only at a 4.0+ rating.'}
+      ]},
+    {key:'retention',eyebrow:'Retention',title:'Retention',
+      answers:['Are customers turning into subscribers?'],
+      metrics:[
+        {id:'active-subs',name:'Active Subscriptions',freq:'monthly',dir:'up',unit:'num',note:'Starts once Subscribe & Save is eligible. Enter N/A until then.'},
+        {id:'sns-sales',name:'S&S Sales %',freq:'monthly',dir:'up',unit:'%',note:'Share of sales from Subscribe & Save. Enter N/A until eligible.'}
+      ]}
+  ];
+
+  const STATUS_OPTIONS=['Not Yet Tracking','Improving','Stable','Declining'];
+  const STATUS_CLASS={'Not Yet Tracking':'st-none','Improving':'st-good','Stable':'st-mid','Declining':'st-bad'};
+  const OVERALL_OPTIONS=['Not Yet Tracking','On Track','At Risk','Off Track'];
+  const OVERALL_CLASS={'Not Yet Tracking':'st-none','On Track':'st-good','At Risk':'st-mid','Off Track':'st-bad'};
+
+  /* ============================================================
+     DATA LAYER: append-only event log in the shared comments table
+     ============================================================ */
+  let EVENTS=[]; let CONNECTED=true;
+  const OPEN=new Set();   // remembers open history/comment panels across re-renders
+
+  async function fetchEvents(){
+    try{
+      const r=await fetch(`${SUPABASE_URL}/rest/v1/comments?section_id=like.${DOC_PREFIX}~*&order=created_at.asc`,
+        {headers:{apikey:SUPABASE_KEY,Authorization:`Bearer ${SUPABASE_KEY}`}});
+      if(!r.ok) throw new Error('fetch failed');
+      return await r.json();
+    }catch(e){ console.error(e); return null; }
+  }
+
+  async function pushEvent(sectionKey,itemId,author,payload){
+    const section_id=`${DOC_PREFIX}~${sectionKey}~${itemId}`;
+    const r=await fetch(`${SUPABASE_URL}/rest/v1/comments`,{
+      method:'POST',
+      headers:{apikey:SUPABASE_KEY,Authorization:`Bearer ${SUPABASE_KEY}`,'Content-Type':'application/json','Prefer':'return=representation'},
+      body:JSON.stringify({section_id,name:author||'Team',body:JSON.stringify(payload)})
+    });
+    if(!r.ok) throw new Error('save failed');
+    return await r.json();
+  }
+
+  function buildState(events,sectionKey,seedItems){
+    const items={};
+    seedItems.forEach(s=>{ items[s.id]={id:s.id,fields:{...(s.fields||{})},status:s.status||'Not Yet Tracking',comments:[]}; });
+    (events||[]).forEach(ev=>{
+      const parts=ev.section_id.split('~');
+      if(parts[1]!==sectionKey) return;
+      const itemId=parts[2];
+      let payload; try{ payload=JSON.parse(ev.body); }catch(e){ return; }
+      if(!items[itemId]) items[itemId]={id:itemId,fields:{},status:'Not Yet Tracking',comments:[]};
+      if(payload.op==='upsert') items[itemId].fields={...items[itemId].fields,...(payload.fields||{})};
+      else if(payload.op==='status') items[itemId].status=payload.status;
+      else if(payload.op==='comment') items[itemId].comments.push({name:ev.name,body:payload.text,created_at:ev.created_at});
+    });
+    return items;
+  }
+
+  /* ============================================================
+     HELPERS
+     ============================================================ */
+  function escHtml(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+  function isBlank(v){return v==null||String(v).trim()==='';}
+  function parseNum(raw){
+    if(raw==null) return NaN;
+    const s=String(raw).trim();
+    if(!s||/^n\s*\/?\s*a$/i.test(s)) return NaN;
+    const c=s.replace(/[$£€,%\s#★]/g,'').replace(/pts?$/i,'');
+    return /^-?\d*\.?\d+$/.test(c)?parseFloat(c):NaN;
+  }
+  function fmtVal(m,raw){
+    if(isBlank(raw)) return null;
+    const n=parseNum(raw);
+    if(isNaN(n)) return String(raw).trim();
+    switch(m.unit){
+      case '$': { const dec=Math.abs(n%1)>0; return (n<0?'-':'')+'$'+Math.abs(n).toLocaleString('en-US',{minimumFractionDigits:dec?2:0,maximumFractionDigits:2}); }
+      case '%': return (+n.toFixed(2))+'%';
+      case 'rating': return n.toFixed(1)+' ★';
+      case 'rank': return '#'+(+n.toFixed(1));
+      default: return n.toLocaleString('en-US',{maximumFractionDigits:2});
+    }
+  }
+  function deltaBadge(m,prevRaw,curRaw){
+    if(isBlank(prevRaw)||isBlank(curRaw)) return '';
+    const p=parseNum(prevRaw), c=parseNum(curRaw);
+    if(isNaN(p)||isNaN(c)) return '';               // N/A or text: no bogus %
+    const diff=c-p, ad=Math.abs(diff);
+    let txt;
+    if(diff===0) txt='0';
+    else if(m.unit==='%') txt=ad.toFixed(1)+' pts';
+    else if(m.unit==='rating') txt=ad.toFixed(1);
+    else if(m.unit==='rank') txt=(+ad.toFixed(1))+(ad===1?' place':' places');
+    else txt=p!==0?(ad/Math.abs(p)*100).toFixed(1).replace(/\.0$/,'')+'%':'new';
+    const arrow=diff>0?'▲':diff<0?'▼':'▬';
+    let cls='neutral';
+    if(diff!==0){ cls=m.dir==='context'?'flat':(((m.dir==='up')===(diff>0))?'up':'down'); }
+    return `<span class="delta ${cls}">${arrow} ${txt}</span>`;
+  }
+
+  const DAY=86400000;
+  function parseDate(s){ if(!s||!/^\d{4}-\d{2}-\d{2}$/.test(s)) return null; const [y,mo,d]=s.split('-').map(Number); return new Date(y,mo-1,d); }
+  function shortDate(d,withYear){ return d.toLocaleDateString('en-GB',withYear?{day:'numeric',month:'short',year:'numeric'}:{day:'numeric',month:'short'}); }
+  function rangeLabel(a,b){
+    if(a.getMonth()===b.getMonth()) return a.getDate()+'–'+shortDate(b);
+    return shortDate(a)+'–'+shortDate(b);
+  }
+  function getGolive(){ const st=buildState(EVENTS,'launch',[{id:'listing-launched'}])['listing-launched']; return {launched:st.fields.launched||'No',date:st.fields.golive||'',state:st}; }
+  function periodDates(freq,p,golive){
+    const g=parseDate(golive); if(!g) return freq==='monthly'?p.days:'';
+    let start,end;
+    if(freq==='weekly'){ start=new Date(g.getTime()+p.idx*7*DAY); end=new Date(start.getTime()+6*DAY); }
+    else { const s=[0,31,61][p.idx], e=[30,60,90][p.idx]; start=new Date(g.getTime()+s*DAY); end=new Date(g.getTime()+e*DAY); }
+    return rangeLabel(start,end);
+  }
+  function currentPeriodIdx(freq,golive){
+    const g=parseDate(golive); if(!g) return -1;
+    const t=new Date(); t.setHours(0,0,0,0);
+    const d=Math.floor((t-g)/DAY); if(d<0) return -1;
+    if(freq==='weekly'){ const w=Math.floor(d/7); return w<13?w:-1; }
+    if(d<=30) return 0; if(d<=60) return 1; if(d<=90) return 2; return -1;
+  }
+  function formatStamp(iso){ const d=new Date(iso); return shortDate(d,true)+' · '+d.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'}); }
+
+  const ICON_EDIT='<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>';
+  const ICON_COMMENT='<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>';
+
+  /* ============================================================
+     RENDER
+     ============================================================ */
+  function render(){
+    const golive=getGolive();
+    renderHero(golive);
+    const root=document.getElementById('root');
+    root.innerHTML='';
+    SECTIONS.forEach((sec,si)=>{
+      const items=buildState(EVENTS,sec.key,sec.metrics.map(m=>({id:m.id})));
+      const el=document.createElement('section');
+      el.className='section'+(sec.primary?' primary':'');
+      el.id='sec-'+sec.key;
+      el.innerHTML=`
+        <div class="sec-head">
+          <div class="sec-eyebrow">${String(si+1).padStart(2,'0')} · ${escHtml(sec.eyebrow)}</div>
+          <h2 class="sec-title">${escHtml(sec.title)}</h2>
+          <div class="sec-answers">Answers: ${sec.answers.map(escHtml).join(' · ')}</div>
+        </div>
+        <div class="m-grid ${sec.metrics.length===1?'single':''}"></div>`;
+      const grid=el.querySelector('.m-grid');
+      sec.metrics.forEach(m=>{
+        const card=m.type==='milestone'?milestoneCard(sec,m,items[m.id],golive):metricCard(sec,m,items[m.id],golive);
+        grid.appendChild(card);
+      });
+      root.appendChild(el);
+    });
+  }
+
+  function renderHero(golive){
+    // last updated
+    const last=EVENTS.length?EVENTS[EVENTS.length-1].created_at:null;
+    document.getElementById('statUpdated').innerHTML=last?escHtml(formatStamp(last)):'No entries yet';
+    // go-live
+    const g=parseDate(golive.date);
+    const live=golive.launched==='Yes';
+    document.getElementById('statGolive').innerHTML=g
+      ?`${escHtml(shortDate(g,true))}<small>${live?'Listing live':'Planned go-live'}</small>`
+      :(live?'Live<small>Add the go-live date below</small>':'Not yet live');
+    // window
+    let win='Pre-launch';
+    if(g){
+      const t=new Date(); t.setHours(0,0,0,0);
+      const d=Math.floor((t-g)/DAY);
+      if(d<0) win=`Pre-launch<small>Go-live in ${-d} day${d===-1?'':'s'}</small>`;
+      else if(d<=90) win=`Week ${Math.min(13,Math.floor(d/7)+1)} of 13<small>Day ${d} of 90</small>`;
+      else win='90 days complete<small>Ready to set targets</small>';
+    }
+    document.getElementById('statWindow').innerHTML=win;
+    // overall status
+    const ov=buildState(EVENTS,'overview',[{id:'main'}])['main'];
+    const sel=document.getElementById('overallStatus');
+    const cur=OVERALL_OPTIONS.includes(ov.status)?ov.status:'Not Yet Tracking';
+    sel.innerHTML=OVERALL_OPTIONS.map(o=>`<option ${o===cur?'selected':''}>${o}</option>`).join('');
+    sel.className='tk-status-select '+OVERALL_CLASS[cur];
+    sel.onchange=async e=>{
+      const v=e.target.value; sel.className='tk-status-select '+OVERALL_CLASS[v];
+      try{ await pushEvent('overview','main','Team',{op:'status',status:v}); }catch(err){ alert('Could not save the status. Check your connection and try again.'); }
+      reload();
+    };
+  }
+
+  function controlsHTML(item,editable){
+    const n=item.comments.length;
+    return `<div class="m-controls">
+      ${editable?`<button class="tk-icon-btn" data-role="edit-toggle" title="Edit values" aria-label="Edit values">${ICON_EDIT}</button>`:''}
+      <button class="tk-icon-btn ${n?'has-comments':''}" data-role="comment-toggle" title="Comments" aria-label="Comments">${ICON_COMMENT}${n?`<span class="tk-badge">${n}</span>`:''}</button>
+    </div>`;
+  }
+
+  function statusSelectHTML(item){
+    const cur=STATUS_OPTIONS.includes(item.status)?item.status:'Not Yet Tracking';
+    return `<select class="tk-status-select ${STATUS_CLASS[cur]}" data-role="status" aria-label="Status">${STATUS_OPTIONS.map(o=>`<option ${o===cur?'selected':''}>${o}</option>`).join('')}</select>`;
+  }
+
+  function metricCard(sec,m,item,golive){
+    const periods=PERIODS[m.freq];
+    const unitWord=m.freq==='weekly'?'week':'month';
+    const domId=`${sec.key}-${m.id}`;
+    const f=item.fields;
+
+    // current = latest populated period; previous = populated period before it
+    let ci=-1; periods.forEach((p,i)=>{ if(!isBlank(f[p.key])) ci=i; });
+    let pi=-1; for(let i=ci-1;i>=0;i--){ if(!isBlank(f[periods[i].key])){ pi=i; break; } }
+    const cur=ci>=0?periods[ci]:null, prev=pi>=0?periods[pi]:null;
+    const nowIdx=currentPeriodIdx(m.freq,golive.date);
+
+    const sumCell=(lbl,p)=>p
+      ?`<div class="sum-cell"><span class="sum-lbl">${lbl}</span><span class="sum-val">${escHtml(fmtVal(m,f[p.key]))}</span><span class="sum-sub">${escHtml(p.label)}</span></div>`
+      :`<div class="sum-cell"><span class="sum-lbl">${lbl}</span><span class="sum-val empty">Not yet entered</span></div>`;
+    const badge=cur&&prev?deltaBadge(m,f[prev.key],f[cur.key]):'';
+    const changeCell=`<div class="sum-cell"><span class="sum-lbl">Change</span>${badge
+      ?`<div class="sum-delta">${badge}</div><span class="sum-sub">vs ${escHtml(prev.label)}</span>`
+      :`<span class="sum-val empty">${cur&&prev?'Not comparable':'Needs 2 periods'}</span>`}</div>`;
+
+    // sparkline
+    const pts=[]; periods.forEach((p,i)=>{ const v=parseNum(f[p.key]); if(!isNaN(v)) pts.push({i,v}); });
+    let spark;
+    if(pts.length>=2){
+      const vals=pts.map(p=>p.v); let lo=Math.min(...vals), hi=Math.max(...vals);
+      if(lo===hi){ lo-=1; hi+=1; }
+      const invert=m.unit==='rank';
+      const X=i=>periods.length>1?i/(periods.length-1)*100:50;
+      const Y=v=>{ let t=(v-lo)/(hi-lo); if(invert) t=1-t; return 88-t*76; };
+      const line=pts.map(p=>`${X(p.i).toFixed(2)},${Y(p.v).toFixed(2)}`).join(' ');
+      const lastP=pts[pts.length-1];
+      spark=`<div class="spark" title="${escHtml(m.name)} trend${invert?' (higher on chart = better rank)':''}">
+        <svg viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+          <polyline points="${line}" fill="none" stroke="#0F1B2A" stroke-width="2" vector-effect="non-scaling-stroke" stroke-linejoin="round" stroke-linecap="round"/>
+        </svg>
+        ${pts.slice(0,-1).map(p=>`<span class="spark-pt" style="left:${X(p.i)}%;top:${Y(p.v)}%"></span>`).join('')}
+        <span class="spark-dot" style="left:${X(lastP.i)}%;top:${Y(lastP.v)}%"></span>
+      </div>
+      <div class="spark-axis"><span>${periods[0].short}</span><span>${periods[periods.length-1].short}</span></div>`;
+    } else {
+      spark=`<div class="spark-empty">Trend line appears once two ${unitWord}s are entered.</div>`;
+    }
+
+    // history cells
+    const hist=periods.map((p,i)=>{
+      const v=f[p.key];
+      let prevRaw=null; for(let j=i-1;j>=0;j--){ if(!isBlank(f[periods[j].key])){ prevRaw=f[periods[j].key]; break; } }
+      const val=fmtVal(m,v);
+      return `<div class="p-cell ${i===nowIdx?'now':''}">
+        <span class="p-lbl">${escHtml(p.label)}</span>
+        <span class="p-date">${escHtml(periodDates(m.freq,p,golive.date))||'&nbsp;'}</span>
+        <span class="p-val ${val===null?'empty':''}">${val===null?'Not yet entered':escHtml(val)}</span>
+        ${val!==null&&prevRaw!==null?deltaBadge(m,prevRaw,v):''}
+      </div>`;
+    }).join('');
+
+    const edits=periods.map(p=>`<label class="p-cell">
+        <span class="p-lbl">${escHtml(p.label)}</span>
+        <span class="p-date">${escHtml(periodDates(m.freq,p,golive.date))||'&nbsp;'}</span>
+        <input class="p-input" data-key="${p.key}" value="${escHtml(f[p.key]||'')}" placeholder="${m.unit==='$'?'$0':m.unit==='%'?'0%':m.unit==='rank'?'#':'—'}">
+      </label>`).join('');
+
+    const histOpen=OPEN.has('h-'+domId), comOpen=OPEN.has('c-'+domId);
+    const card=document.createElement('article');
+    card.className='m-card'; card.id='card-'+domId; card.dataset.metric=m.id; card.dataset.dir=m.dir;
+    card.innerHTML=`
+      <div class="m-head">
+        <div class="m-title-wrap">
+          <div class="m-name">${escHtml(m.name)}<span class="m-freq">${m.freq==='weekly'?'Weekly':'Monthly'}</span></div>
+          ${m.note?`<div class="m-note">${escHtml(m.note)}</div>`:''}
+        </div>
+        ${controlsHTML(item,true)}
+      </div>
+      ${statusSelectHTML(item)}
+      <div class="view" data-role="view">
+        <div class="m-summary">${sumCell('Current',cur)}${sumCell('Previous',prev)}${changeCell}</div>
+        ${spark}
+        <button class="hist-toggle" data-role="hist-toggle">${histOpen?'Hide':'Show'} ${unitWord}ly history ${histOpen?'▴':'▾'}</button>
+        <div class="hist ${histOpen?'open':''}" data-role="hist"><div class="p-grid">${hist}</div></div>
+      </div>
+      <div class="tk-edit-wrap" data-role="edit-wrap">
+        <p class="edit-hint">Enter each ${unitWord}'s value. Use N/A where a metric doesn't apply yet. Leave blank if not yet reported.</p>
+        <div class="p-grid">${edits}</div>
+        <div class="tk-edit-actions">
+          <button class="tk-edit-save" data-role="edit-save">Save</button>
+          <button class="tk-edit-cancel" data-role="edit-cancel">Cancel</button>
+        </div>
+      </div>
+      <div class="tk-comment-panel ${comOpen?'open':''}" data-role="comment-panel">${commentPanelHTML(domId,item)}</div>`;
+
+    wireCommon(card,sec,m,item,domId);
+
+    // history toggle
+    card.querySelector('[data-role="hist-toggle"]').addEventListener('click',()=>{
+      const h=card.querySelector('[data-role="hist"]'); const open=h.classList.toggle('open');
+      open?OPEN.add('h-'+domId):OPEN.delete('h-'+domId);
+      card.querySelector('[data-role="hist-toggle"]').textContent=`${open?'Hide':'Show'} ${unitWord}ly history ${open?'▴':'▾'}`;
+    });
+
+    // edit in place
+    const view=card.querySelector('[data-role="view"]'), ew=card.querySelector('[data-role="edit-wrap"]');
+    card.querySelector('[data-role="edit-toggle"]').addEventListener('click',()=>{
+      const opening=!ew.classList.contains('open');
+      ew.classList.toggle('open',opening); view.classList.toggle('hidden',opening);
+      if(opening){ const first=ew.querySelector('.p-input'); if(first) first.focus(); }
+    });
+    card.querySelector('[data-role="edit-cancel"]').addEventListener('click',()=>{
+      ew.querySelectorAll('.p-input').forEach(inp=>{ inp.value=f[inp.dataset.key]||''; });
+      ew.classList.remove('open'); view.classList.remove('hidden');
+    });
+    card.querySelector('[data-role="edit-save"]').addEventListener('click',async()=>{
+      const changed={};
+      ew.querySelectorAll('.p-input').forEach(inp=>{ const v=inp.value.trim(); if(v!==(f[inp.dataset.key]||'')) changed[inp.dataset.key]=v; });
+      if(!Object.keys(changed).length){ ew.classList.remove('open'); view.classList.remove('hidden'); return; }
+      const btn=card.querySelector('[data-role="edit-save"]'); btn.disabled=true; btn.textContent='Saving…';
+      try{ await pushEvent(sec.key,m.id,'Team',{op:'upsert',fields:changed}); await reload(); }
+      catch(e){ alert('Could not save. Check your connection and try again.'); btn.disabled=false; btn.textContent='Save'; }
+    });
+    return card;
+  }
+
+  function milestoneCard(sec,m,item,golive){
+    const domId=`${sec.key}-${m.id}`;
+    const launched=item.fields.launched==='Yes'?'Yes':'No';
+    const g=parseDate(item.fields.golive);
+    let days='Not yet live', daysSub='';
+    if(g){
+      const t=new Date(); t.setHours(0,0,0,0); const d=Math.floor((t-g)/DAY);
+      if(d<0){ days=`${-d} day${d===-1?'':'s'} to go`; daysSub='Until planned go-live'; }
+      else { days=`Day ${d}`; daysSub=d<=90?'Of the 90-day launch window':'Launch window complete'; }
+    }
+    const comOpen=OPEN.has('c-'+domId);
+    const card=document.createElement('article');
+    card.className='m-card'; card.id='card-'+domId; card.dataset.metric=m.id;
+    card.innerHTML=`
+      <div class="m-head">
+        <div class="m-title-wrap">
+          <div class="m-name">${escHtml(m.name)}<span class="m-freq">One-time milestone</span></div>
+          <div class="m-note">The go-live date sets the dates on every weekly and monthly column below.</div>
+        </div>
+        ${controlsHTML(item,false)}
+      </div>
+      <div class="ms-grid">
+        <div class="sum-cell"><span class="sum-lbl">Listing live?</span>
+          <select class="tk-status-select ${launched==='Yes'?'st-good':'st-none'}" data-role="launched" aria-label="Listing launched">
+            <option ${launched==='No'?'selected':''} value="No">No</option>
+            <option ${launched==='Yes'?'selected':''} value="Yes">Yes</option>
+          </select></div>
+        <div class="sum-cell"><span class="sum-lbl">Go-live date</span>
+          <input type="date" class="ms-date" data-role="golive" value="${escHtml(item.fields.golive||'')}" aria-label="Go-live date"></div>
+        <div class="sum-cell"><span class="sum-lbl">Days live</span><span class="sum-val ${g?'':'empty'}">${escHtml(days)}</span>${daysSub?`<span class="sum-sub">${escHtml(daysSub)}</span>`:''}</div>
+      </div>
+      <div class="tk-comment-panel ${comOpen?'open':''}" data-role="comment-panel">${commentPanelHTML(domId,item)}</div>`;
+
+    card.querySelector('[data-role="launched"]').addEventListener('change',async e=>{
+      const v=e.target.value; e.target.className='tk-status-select '+(v==='Yes'?'st-good':'st-none');
+      try{ await pushEvent(sec.key,m.id,'Team',{op:'upsert',fields:{launched:v}}); }catch(err){ alert('Could not save. Check your connection and try again.'); }
+      reload();
+    });
+    card.querySelector('[data-role="golive"]').addEventListener('change',async e=>{
+      try{ await pushEvent(sec.key,m.id,'Team',{op:'upsert',fields:{golive:e.target.value}}); }catch(err){ alert('Could not save. Check your connection and try again.'); }
+      reload();
+    });
+    wireComments(card,sec,m,domId);
+    return card;
+  }
+
+  function commentPanelHTML(domId,item){
+    const n=item.comments.length;
+    const thread=n===0?'<p class="tk-no-comments">No comments yet on this metric.</p>'
+      :item.comments.map(c=>`<div class="tk-comment-item">
+          <div class="tk-comment-item-header"><span class="tk-comment-item-name">${escHtml(c.name||'Anonymous')}</span><span class="tk-comment-item-time">${escHtml(formatStamp(c.created_at))}</span></div>
+          <p class="tk-comment-item-text">${escHtml(c.body)}</p></div>`).join('');
+    return `<div class="tk-comment-thread">${thread}</div>
+      <div class="tk-comment-form">
+        <textarea data-role="c-text" rows="2" placeholder="Add a note or question on this metric..."></textarea>
+        <div class="tk-comment-form-row">
+          <input type="text" data-role="c-name" placeholder="Your name (optional)">
+          <button class="tk-comment-post-btn" data-role="c-post">Post</button>
+        </div>
+        <div class="tk-comment-status" data-role="c-status"></div>
+      </div>`;
+  }
+
+  function wireCommon(card,sec,m,item,domId){
+    const sel=card.querySelector('[data-role="status"]');
+    if(sel) sel.addEventListener('change',async e=>{
+      const v=e.target.value; sel.className='tk-status-select '+STATUS_CLASS[v];
+      try{ await pushEvent(sec.key,m.id,'Team',{op:'status',status:v}); }catch(err){ alert('Could not save the status. Check your connection and try again.'); }
+      reload();
+    });
+    wireComments(card,sec,m,domId);
+  }
+
+  function wireComments(card,sec,m,domId){
+    const panel=card.querySelector('[data-role="comment-panel"]');
+    card.querySelector('[data-role="comment-toggle"]').addEventListener('click',()=>{
+      const open=panel.classList.toggle('open');
+      open?OPEN.add('c-'+domId):OPEN.delete('c-'+domId);
+      if(open) setTimeout(()=>panel.querySelector('textarea').focus(),40);
+    });
+    card.querySelector('[data-role="c-post"]').addEventListener('click',async()=>{
+      const txt=panel.querySelector('[data-role="c-text"]'), nm=panel.querySelector('[data-role="c-name"]');
+      const st=panel.querySelector('[data-role="c-status"]'), btn=panel.querySelector('[data-role="c-post"]');
+      const body=txt.value.trim();
+      if(!body){ st.textContent='Please write something first.'; st.style.color='var(--red-ink)'; return; }
+      btn.disabled=true; st.textContent='Posting...'; st.style.color='var(--muted)';
+      try{ await pushEvent(sec.key,m.id,nm.value.trim()||'Anonymous',{op:'comment',text:body}); OPEN.add('c-'+domId); await reload(); }
+      catch(e){ st.textContent='Failed to post. Please try again.'; st.style.color='var(--red-ink)'; btn.disabled=false; }
+    });
+  }
+
+  async function reload(){
+    const ev=await fetchEvents();
+    if(ev===null){ CONNECTED=false; } else { CONNECTED=true; EVENTS=ev; }
+    document.getElementById('dbBanner').classList.toggle('show',!CONNECTED);
+    render();
+  }
+
+  // nav + footer mark
+  document.getElementById('navLinks').innerHTML=SECTIONS.map(s=>`<a href="#sec-${s.key}">${escHtml(s.eyebrow==='Launch Readiness'?'Launch':s.eyebrow)}</a>`).join('');
+  (function cloneMark(){
+    const src=document.querySelector('.hero .ftr-mark'), dst=document.querySelector('footer .ftr-mark');
+    if(src&&dst) dst.innerHTML=src.innerHTML;
+  })();
+
+  render();
+  reload();
+</script>
+</body>
+</html>
